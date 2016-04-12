@@ -143,10 +143,32 @@ class Editor(object):
         with open(filename, 'r') as f:
             self.main_buffer = f.readlines()
         
+
+def get_input(scr, y, x):
+    import curses.ascii
+    esc_pressed = False
+    input_str = ""
+    key = None
+    scr.move(y,x)
+    while not esc_pressed:
+        key = scr.getch()
+        if key == curses.ascii.ESC:
+            esc_pressed = True
+        elif key == curses.ascii.NL:
+            scr.move(y+1,x)
+            input_str += '\n'
+        elif key == curses.ascii.BS:
+            tmp = input_str[:-1]
+            input_str = tmp
+        else:
+            try:
+                input_str += chr(key)
+            except:
+                pass
+    return input_str
              
 if __name__ == "__main__":
     import os, curses
-    from curses.textpad import Textbox, rectangle
 
     ed = Editor()
     current_line = 0
@@ -208,12 +230,22 @@ if __name__ == "__main__":
 
         if read == 'i':
             curses.echo()
-            #stdscr.standout()
+            #s = stdscr.getstr(current_line,current_letter,1024)
+            s = get_input(stdscr, current_line, current_letter)
+            # FIXME: parse s for newline and add parts of string as new inserts
+            #        also put all of this inside a function
+            ed.execute(Insert(ed.main_buffer, s, current_line, current_letter, current_letter + len(s)))
+            current_letter += len(s)
+            curses.noecho()
+
+        if read == 'o':
+            ed.main_buffer.append("")
+            current_line += 1
+            curses.echo()
             s = stdscr.getstr(current_line,current_letter,1024)
             ed.execute(Insert(ed.main_buffer, s, current_line, current_letter, current_letter + len(s)))
             current_letter += len(s)
             curses.noecho()
-            #stdscr.standend()
 
         if read == 'd':
             cmd = Delete(ed.main_buffer,current_line,current_letter)
@@ -265,6 +297,8 @@ if __name__ == "__main__":
             stdscr.addstr(MAX_Y-1, 0, "cmd_stack: "+str(len(ed.command_stack))) 
         if read == 'KEY_F(3)':
             stdscr.addstr(MAX_Y-1, 0, "undo_stack: " +str(len(ed.undo_stack))) 
+        if read == 'KEY_F(4)':
+            stdscr.addstr(MAX_Y-1, 0, "main_buffer: " +str(len(ed.main_buffer))) 
 
         #show cursor on the screen 
         curses.curs_set(2)
