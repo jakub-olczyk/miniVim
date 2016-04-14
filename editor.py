@@ -66,7 +66,7 @@ class Insert(iCommand):
             self.changed = self.document[self.line]
 
         new_line = self.changed
-        new_line = inserter(new_line, self.text, self.start) # FIXME
+        new_line = inserter(new_line, self.text, self.start) 
         self.document[self.line] = new_line
 
     def undo(self):
@@ -134,8 +134,7 @@ class Editor(object):
 
         with open("./"+self.file_name,'w+') as f:
             for line in self.main_buffer:
-                line = str(line).strip()
-                f.write(line+"\n")
+                f.write(line)
 
     @excepted
     def open_file(self, filename):
@@ -166,6 +165,19 @@ def get_input(scr, y, x):
             except:
                 pass
     return input_str
+
+def input_sanitizer(text):
+    """
+    text: string, the user input that needs to be inserted to doc_buffer
+    doc_buffer: list
+    start_line: int, the line where we need to put the new lines
+    """
+    if text.count('\n') != 1:
+        sanitazed = list(str(text).split('\n'))
+        sanitazed = [line+'\n' for line in sanitazed]
+    else: # when we put new string inside one
+        sanitazed = tuple(str(text).strip('\n'))
+    return sanitazed
              
 if __name__ == "__main__":
     import os, curses
@@ -230,12 +242,17 @@ if __name__ == "__main__":
 
         if read == 'i':
             curses.echo()
+            cli = current_line
+            clt = current_letter
             #s = stdscr.getstr(current_line,current_letter,1024)
-            s = get_input(stdscr, current_line, current_letter)
-            # FIXME: parse s for newline and add parts of string as new inserts
-            #        also put all of this inside a function
-            ed.execute(Insert(ed.main_buffer, s, current_line, current_letter, current_letter + len(s)))
-            current_letter += len(s)
+            s = get_input(stdscr, cli, clt)
+            s = input_sanitizer(s) # now this is a list of NL ended strings
+            for n,line in enumerate(s):
+                eb = ed.main_buffer
+                i = Insert(eb, line, cli+n, clt, clt + len(line))
+                ed.execute(i)
+            current_letter += len(s[-1])
+            current_line += len(s)
             curses.noecho()
 
         if read == 'o':
