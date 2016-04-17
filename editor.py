@@ -1,100 +1,28 @@
 #!/usr/bin/env python
 # coding=utf8
 # 
-# Copyright (c) Jakub Olczyk 
-# Published under GNU General Public License version 2 or above
-# For full text of the license visit www.gnu.org/licenses/gpl.html
+#    miniVim
+#    Copyright (c) Jakub Olczyk 
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from commands import Insert, Delete
+from utils import excepted, get_input, input_sanitizer
+from dispatcher import Dispatcher
 
 """
-Mega uproszczony Vim stworzony w jakieś 3-4h
+Mega uproszczony Vim stworzony jako projekt zaliczeniowy
 """
-
-def excepted(func):
-    """ To jest dekorator do łapania wszelkich niepotrzebnych wyjatkow """
-    def func_wrap(*args, **kwargs):
-        try:
-            func(*args, **kwargs)
-        except:
-            pass
-    return func_wrap 
-
-
-class iCommand(object): # pseudo-interface in Python
-    def __init__(self, document, text, line, start, end):
-        pass
-    def execute(self):
-        pass
-    def undo(self):
-        pass
-
-class Insert(iCommand):
-    """
-    Acts similarly to Vi instert mode, but not quite :)
-    """
-    def __init__(self, document, text, line, start, end):
-        """
-        document: handle for the buffer
-        text: actual change text
-        line: the line where insert was done 
-        start: the starting position of change
-        end: the ending position of change
-        """
-        self.text = text
-        self.changed = ""
-        self.document = document
-        self.line = line
-        self.start = start 
-        self.end = end
-    
-    def execute(self):
-        def inserter(src, trgt, start):
-            """
-            src   : string
-            trgt  : string
-            start : number
-            return: new string based on src with trgt string in between the point start
-            """
-            result = ""
-            result += src[:start]
-            result += trgt
-            result += src[start:]
-            return result
-        try:
-            self.changed = str(self.document[self.line]) 
-        except:
-            self.document.append("")
-            self.changed = self.document[self.line]
-
-        new_line = self.changed
-        new_line = inserter(new_line, self.text, self.start) 
-        self.document[self.line] = new_line
-
-    def undo(self):
-        self.document[self.line] = self.changed
-        if self.changed == "":
-            self.document.pop()
-
-class Delete(iCommand):
-    """
-    Delete from cursor to end of line.
-    """
-    def __init__(self, document, line, start, text=None, end=None):
-        self.document = document
-        self.text = text #deleted text
-        self.line = line
-        self.start = start
-        self.end = end
-
-    def execute(self):
-        try:
-            self.text = self.document[self.line][self.start:]
-            new_line = self.document[self.line][:self.start]
-            self.document[self.line] = new_line
-        except:
-            self.text = ""
-
-    def undo(self):
-        self.document[self.line] += self.text
 
 class Editor(object):
     def __init__(self):
@@ -102,6 +30,8 @@ class Editor(object):
         self.main_buffer = [] # each string in this list is line of text
         self.command_stack = [] # stack of commands executed 
         self.undo_stack = [] # stack of undone commands for redo(?)
+        self.current_line = 0
+        self.current_letter = 0
 
     @excepted
     def undo_last(self):
@@ -141,138 +71,78 @@ class Editor(object):
         self.file_name = filename
         with open(filename, 'r') as f:
             self.main_buffer = f.readlines()
+
+
+    @excepted
+    def cursor_left(self):
+        if self.current_letter > 0:
+            self.current_letter -= 1
+
+    @excepted
+    def cursor_right(self):
+        if self.current_letter < len(self.main_buffer[self.current_line]):
+            self.current_letter += 1
+
+    @excepted
+    def cursor_up(self):
+        if self.current_line > 0:
+            self.current_line -= 1
+        if self.current_letter > len(self.main_buffer[self.current_line]):
+            self.current_letter = len(self.main_buffer[self.current_line])
+
+    @excepted
+    def cursor_down(self):
+        if self.current_line < len(self.main_buffer) - 1 :
+            self.current_line += 1
+        if self.current_letter > len(self.main_buffer[self.current_line]):
+            self.current_letter = len(self.main_buffer[self.current_line])
         
+    def enter_insert(self):
+        curses.echo()
+        mb = self.main_buffer
+        cli = self.current_line
+        clt = self.current_letter
+        s = get_input(stdscr, cli, clt)
+        s = input_sanitizer(s) # now this is a list of NL ended strings
+        for n,line in enumerate(s):
+            i = Insert(mb, line, cli+n, clt, clt + len(line))
+            ed.execute(i)
+        ed.current_letter += len(s[-1])
+        ed.current_line += len(s)
+        curses.noecho()
 
-def get_input(scr, y, x):
-    import curses.ascii
-    esc_pressed = False
-    input_str = ""
-    key = None
-    scr.move(y,x)
-    while not esc_pressed:
-        key = scr.getch()
-        if key == curses.ascii.ESC:
-            esc_pressed = True
-        elif key == curses.ascii.NL:
-            scr.move(y+1,x)
-            input_str += '\n'
-        elif key == curses.ascii.BS:
-            tmp = input_str[:-1]
-            input_str = tmp
-        else:
-            try:
-                input_str += chr(key)
-            except:
-                pass
-    return input_str
+    def enter_delete(self):
+        cmd = Delete(self.main_buffer, self.current_line, self.current_letter)
+        self.execute(cmd)
 
-def input_sanitizer(text):
-    """
-    text: string, the user input that needs to be inserted to doc_buffer
-    doc_buffer: list
-    start_line: int, the line where we need to put the new lines
-    """
-    if text.count('\n') != 1:
-        sanitazed = list(str(text).split('\n'))
-        sanitazed = [line+'\n' for line in sanitazed]
-    else: # when we put new string inside one
-        sanitazed = tuple(str(text).strip('\n'))
-    return sanitazed
              
 if __name__ == "__main__":
     import os, curses
 
     ed = Editor()
-    current_line = 0
-    current_letter = 0
-
     stdscr = curses.initscr()
-
     curses.noecho()
     stdscr.keypad(True)
     curses.cbreak()
     curses.curs_set(2)
+
+    dispatch = Dispatcher(ed)
 
     MAX_Y, MAX_X = stdscr.getmaxyx()
 
     stdscr.refresh()
 
     stdscr.clear()
-    stdscr.addstr(MAX_Y-1, MAX_X-5, "{},{}".format(current_line,current_letter), curses.A_REVERSE)
+    stdscr.addstr(MAX_Y-1, MAX_X-5, "{},{}".format(ed.current_line,ed.current_letter), curses.A_REVERSE)
     ed.print_buffer(stdscr)
 
-    while True:
-        
-        read = stdscr.getkey()
 
+    while True:
+        read = stdscr.getkey()
         #stdscr.addstr(MAX_Y-1, 1, str(read))
         stdscr.refresh()
 
-        if read == 'h':
-            if current_letter > 0:
-                current_letter -= 1
-
-        if read == 'l':
-            try:
-                if current_letter < len(ed.main_buffer[current_line]):
-                    current_letter += 1
-            except:
-                pass
-
-        if read == 'j':
-            try:
-                if current_line < len(ed.main_buffer) - 1 :
-                    current_line += 1
-            except:
-                pass
-            try:
-                if current_letter > len(ed.main_buffer[current_line]):
-                    current_letter = len(ed.main_buffer[current_line])
-            except:
-                pass
-
-        if read == 'k':
-            if current_line > 0:
-                current_line -= 1
-            try:
-                if current_letter > len(ed.main_buffer[current_line]):
-                    current_letter = len(ed.main_buffer[current_line])
-            except:
-                pass
-
-        if read == 'i':
-            curses.echo()
-            cli = current_line
-            clt = current_letter
-            #s = stdscr.getstr(current_line,current_letter,1024)
-            s = get_input(stdscr, cli, clt)
-            s = input_sanitizer(s) # now this is a list of NL ended strings
-            for n,line in enumerate(s):
-                eb = ed.main_buffer
-                i = Insert(eb, line, cli+n, clt, clt + len(line))
-                ed.execute(i)
-            current_letter += len(s[-1])
-            current_line += len(s)
-            curses.noecho()
-
-        if read == 'o':
-            ed.main_buffer.append("")
-            current_line += 1
-            curses.echo()
-            s = stdscr.getstr(current_line,current_letter,1024)
-            ed.execute(Insert(ed.main_buffer, s, current_line, current_letter, current_letter + len(s)))
-            current_letter += len(s)
-            curses.noecho()
-
-        if read == 'd':
-            cmd = Delete(ed.main_buffer,current_line,current_letter)
-            ed.execute(cmd)
-
-        if read == 'u':
-            ed.undo_last()
-
-        if read == 'r':
-            ed.redo_last()
+        dispatch.execute(read)
 
         if read == ':':
             curses.curs_set(2)
@@ -299,10 +169,15 @@ if __name__ == "__main__":
                 filename = s.split(' ')[1] 
                 ed.open_file(filename)
 
+            if s.startswith('p'):
+                cmd, arg = s.split(' ')
+                arg = int(arg)
+                stdscr.addstr(MAX_Y-20,10,ed.main_buffer[arg])
+
         # Main drawing 
         stdscr.clear()
         # draw the line and letter number
-        stdscr.addstr(MAX_Y-1, MAX_X-5, "{},{}".format(current_line,current_letter), curses.A_REVERSE)
+        stdscr.addstr(MAX_Y-1, MAX_X-5, "{},{}".format(ed.current_line,ed.current_letter), curses.A_REVERSE)
         # display last character pressed'
         if read != '\n':
             stdscr.addstr(MAX_Y-1, MAX_X-20, str(read))
@@ -312,15 +187,20 @@ if __name__ == "__main__":
         #DEBUG: print the command_stack
         if read == 'KEY_F(2)':
             stdscr.addstr(MAX_Y-1, 0, "cmd_stack: "+str(len(ed.command_stack))) 
+
         if read == 'KEY_F(3)':
             stdscr.addstr(MAX_Y-1, 0, "undo_stack: " +str(len(ed.undo_stack))) 
+
         if read == 'KEY_F(4)':
             stdscr.addstr(MAX_Y-1, 0, "main_buffer: " +str(len(ed.main_buffer))) 
+
+        if read == 'KEY_F(5)':
+            stdscr.addstr(MAX_Y-20,10,ed.main_buffer[ed.current_line])
 
         #show cursor on the screen 
         curses.curs_set(2)
         stdscr.refresh()
-        curses.setsyx(current_line,current_letter)
+        curses.setsyx(ed.current_line,ed.current_letter)
         curses.doupdate()
             
     curses.nocbreak()
