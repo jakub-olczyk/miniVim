@@ -19,8 +19,11 @@ def excepted(func):
     def func_wrap(*args, **kwargs):
         try:
             func(*args, **kwargs)
-        except:
-            pass # Here should be some sort of logging given the amount of
+        except Exception as e:
+            msg = str(func.__name__)+":" + str(e.args) + str(e.message)
+            with open('vi.log','w+') as log:
+                log.write(msg)
+            # pass # Here should be some sort of logging given the amount of
                  # functions that uses this decorator
     return func_wrap 
 

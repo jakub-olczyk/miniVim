@@ -71,9 +71,8 @@ class Screen(object):
         ''' Set screen to be like normal mode in Vim '''
         pass
 
-    def insert_mode(self):
-        ''' Set screen to be in insert mode '''
-        pass
+
+
 
     def option_mode(self):
         ''' Set screen to be in mode where you enter the commands on commandbar '''
@@ -114,3 +113,12 @@ class Screen(object):
         self.stdscr.refresh()
         curses.setsyx(self.current_buffer.current_line, self.current_buffer.current_letter)
         curses.doupdate()
+
+
+def insert_mode(func):
+    ''' Set screen to be in insert mode then execute what needs executing '''
+    def fun_wrap(*args, **kwargs):
+        curses.echo()
+        func(*args, **kwargs)
+        curses.noecho()
+    return fun_wrap 

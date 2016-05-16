@@ -25,7 +25,18 @@ def enter_insert_o(ed):
 class Dispatcher(object):
     def __init__(self, editor):
         self.editor = editor
-        self.commands =  self.editor.commands
+        # self.commands =  self.editor.commands
+        self.commands = {
+                'h': self.editor.current_buffer.cursor_left,
+                'l': self.editor.current_buffer.cursor_right,
+                'j': self.editor.current_buffer.cursor_down,
+                'k': self.editor.current_buffer.cursor_up,
+                'i': self.editor.enter_insert,
+                # 'o': lambda: enter_insert_o(ed), #FIXME
+                'd': self.editor.enter_delete,
+                'u': self.editor.undo_last,
+                'r': self.editor.redo_last
+            }
 
     @excepted
     def execute(self, cmd_letter):

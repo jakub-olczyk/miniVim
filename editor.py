@@ -20,7 +20,7 @@ from commands import Insert, Delete
 from utils import excepted, get_input, input_sanitizer
 from dispatcher import Dispatcher, enter_insert_o
 from buffer import Buffer
-from screen import Screen
+from screen import Screen, insert_mode
 
 ''' Mega uproszczony Vim stworzony jako projekt zaliczeniowy '''
 
@@ -35,17 +35,6 @@ class Editor(object):
         self.screen = Screen(self.current_buffer)
         self.command_stack = [] # stack of commands executed 
         self.undo_stack = [] # stack of undone commands for redo
-        self.commands = {
-                'h': self.current_buffer.cursor_left,
-                'l': self.current_buffer.cursor_right,
-                'j': self.current_buffer.cursor_down,
-                'k': self.current_buffer.cursor_up,
-                'i': self.enter_insert,
-                # 'o': lambda: enter_insert_o(ed), #FIXME
-                'd': self.enter_delete,
-                'u': self.undo_last,
-                'r': self.redo_last
-            }
 
     @excepted
     def undo_last(self):
@@ -63,19 +52,18 @@ class Editor(object):
         command.execute()
         self.command_stack.append(command)
         
+    @insert_mode
     def enter_insert(self): # FIX THIS : separate model and view
-        curses.echo()
         mb = self.current_buffer
         cli = self.mb.current_line
         clt = self.mb.current_letter
-        s = get_input(stdscr, cli, clt) # FIX this!!!
+        s = get_input(self.screen.stdscr, cli, clt) # FIX this!!!
         s = input_sanitizer(s) # now this is a list of NL ended strings
         for n,line in enumerate(s):
             i = Insert(mb, line, cli+n, clt, clt + len(line))
             ed.execute(i)
-        ed.current_letter += len(s[-1])
-        ed.current_line += len(s)
-        curses.noecho()
+        self.current_buffer.current_letter += len(s[-1])
+        self.current_buffer.current_line += len(s)
 
     def enter_delete(self):
         cmd = Delete(self.main_buffer, self.current_line, self.current_letter)
@@ -109,7 +97,7 @@ class Editor(object):
                     break
 
                 if s.startswith('e'): #edit file
-                    filename = s.split(' ')[1] 
+                    filename = s.split(' ')[1] # FIX : no argument?
                     self.current_buffer.open_file(filename)
 
                 if s.startswith('p'):
