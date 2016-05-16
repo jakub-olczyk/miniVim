@@ -23,19 +23,18 @@ class iCommand(object): # pseudo-interface in Python
         pass
 
 class Insert(iCommand):
-    """
-    Acts similarly to Vi instert mode, but not quite :)
-    """
+    ''' Acts similarly to Vi instert mode, but not quite :) '''
+
     def __init__(self, document, text, line, start, end):
-        """
-        document: handle for the buffer
-        text: actual change text
-        line: the line where insert was done 
-        start: the starting position of change
-        end: the ending position of change
-        """
+        '''
+        @document: handle for the buffer
+        @text: actual change text
+        @line: the line where insert was done 
+        @start: the starting position of change
+        @end: the ending position of change
+        '''
         self.text = text
-        self.changed = ""
+        self.changed = ''
         self.document = document
         self.line = line
         self.start = start 
@@ -43,13 +42,13 @@ class Insert(iCommand):
     
     def execute(self):
         def inserter(src, trgt, start):
-            """
-            src   : string
-            trgt  : string
-            start : number
-            return: new string based on src with trgt string in between the point start
-            """
-            result = ""
+            '''
+            @src   : string
+            @trgt  : string
+            @start : number
+            @return: new string based on src with trgt string in between the point start
+            '''
+            result = ''
             result += src[:start]
             result += trgt
             result += src[start:]
@@ -57,7 +56,7 @@ class Insert(iCommand):
         try:
             self.changed = str(self.document[self.line]) 
         except:
-            self.document.append("")
+            self.document.append('')
             self.changed = self.document[self.line]
 
         new_line = self.changed
@@ -66,13 +65,12 @@ class Insert(iCommand):
 
     def undo(self):
         self.document[self.line] = self.changed
-        if self.changed == "":
+        if self.changed == '':
             self.document.pop()
 
 class Delete(iCommand):
-    """
-    Delete from cursor to end of line.
-    """
+    ''' Delete from cursor to end of line.  '''
+
     def __init__(self, document, line, start, text=None, end=None):
         self.document = document
         self.text = text #deleted text
@@ -86,7 +84,7 @@ class Delete(iCommand):
             new_line = self.document[self.line][:self.start]
             self.document[self.line] = new_line
         except:
-            self.text = ""
+            self.text = ''
 
     def undo(self):
         self.document[self.line] += self.text

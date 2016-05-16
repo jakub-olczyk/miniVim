@@ -14,26 +14,18 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from utils import excepted
 
 def enter_insert_o(ed):
-    ed.main_buffer.append("")
+    ed.main_buffer.append('')
     ed.cursor_down()
     ed.enter_insert()
 
 class Dispatcher(object):
     def __init__(self, editor):
-        self.commands = {
-                'h': editor.cursor_left,
-                'l': editor.cursor_right,
-                'j': editor.cursor_down,
-                'k': editor.cursor_up,
-                'i': editor.enter_insert,
-                'o': lambda: enter_insert_o(editor),
-                'd': editor.enter_delete,
-                'u': editor.undo_last,
-                'r': editor.redo_last
-                }
+        self.editor = editor
+        self.commands =  self.editor.commands
 
     @excepted
     def execute(self, cmd_letter):

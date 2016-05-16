@@ -1,6 +1,4 @@
-#coding=utf8
-
-# 
+# coding=utf8
 #    miniVim
 #    Copyright (c) Jakub Olczyk 
 #    This program is free software: you can redistribute it and/or modify
@@ -17,12 +15,13 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 def excepted(func):
-    """ To jest dekorator do łapania wszelkich niepotrzebnych wyjatkow """
+    ''' To jest dekorator do łapania wszelkich niepotrzebnych wyjatkow '''
     def func_wrap(*args, **kwargs):
         try:
             func(*args, **kwargs)
         except:
-            pass
+            pass # Here should be some sort of logging given the amount of
+                 # functions that uses this decorator
     return func_wrap 
 
 def get_input(scr, y, x):
@@ -32,6 +31,9 @@ def get_input(scr, y, x):
     key = None
     scr.move(y,x)
     while not esc_pressed:
+        my,mx = scr.getmaxyx()
+        scr.addstr(my-20, mx-40, input_str)
+        scr.move(y,x+len(input_str))
         key = scr.getch()
         if key == curses.ascii.ESC:
             esc_pressed = True
@@ -39,7 +41,7 @@ def get_input(scr, y, x):
             scr.move(y+1,x)
             input_str += '\n'
         elif key == curses.ascii.BS:
-            input_str.pop()
+            input_str = input_str[:-1]
         else:
             try:
                 input_str += chr(key)
