@@ -17,10 +17,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from commands import Insert, Delete
-from utils import excepted, get_input, input_sanitizer
+from utils import excepted
 from dispatcher import Dispatcher
 from buffer import Buffer
 from screen import Screen, insert_mode
+from input import Input,  input_sanitizer
 
 ''' Mega uproszczony Vim stworzony jako projekt zaliczeniowy '''
 
@@ -36,6 +37,7 @@ class Editor(object):
         self.current_buffer = self.buffers[0]
 
         self.screen = Screen(self.current_buffer)
+        self.input = Input()
 
         self.command_stack = [] # stack of commands executed 
         self.undo_stack = [] # stack of undone commands for redo
@@ -61,7 +63,7 @@ class Editor(object):
         mb = self.current_buffer
         cli = mb.current_line
         clt = mb.current_letter
-        s = get_input(self.screen.stdscr, cli, clt) # FIX this!!!
+        s = self.input.get(cli, clt) # FIX this!!!
         s = input_sanitizer(s) # now this is a list of NL ended strings
         for n,line in enumerate(s):
             i = Insert(mb, line, cli+n, clt, clt + len(line))
@@ -74,19 +76,20 @@ class Editor(object):
         self.execute(cmd)
 
     def settings(self):
-        self.screen.option_mode() # enter option mode and show it by printing prompt ":"
-        s = str(self.screen.stdscr.getstr(self.screen.MAX_Y-1, 3, 20)) # Ugly but works FIX ME
+        #self.screen.option_mode() # enter option mode and show it by printing prompt ":"
+        s = self.input.prompt_bar(":")
 
         if s.startswith('q'): #exit and discard
             self.running = False
 
         if s.startswith('w'): #saving command
-            self.current_buffer.save_file(stdscr) #broken
-            self.screen.stdscr.addstr(MAX_Y-1,0,str(ed.file_name) + 'Saved')
-            self.screen.stdscr.refresh()
+            if self.current_buffer.file_name == '':
+                self.current_buffer.file_name = self.input.prompt_bar('name:')
+            self.current_buffer.save_file(self.screen.stdscr) #broken
+            self.screen.print_bar(self.current_buffer.file_name + ': Saved')
 
         if s.startswith('x'): #save and exit
-            self.stdscr.addstr(MAX_Y-1,0,'Saving...')
+            self.stdscr.addstr(self.screen.MAX_Y-1,0,'Saving...')
             self.current_buffer.save_file(stdscr) #broken
             self.stdscr.refresh()
             self.running = False
@@ -98,14 +101,20 @@ class Editor(object):
         if s.startswith('p'):
             cmd, arg = s.split(' ')
             arg = int(arg)
-            stdscr.addstr(MAX_Y-20,10,ed.main_buffer[arg])
+            stdscr.addstr(self.screen.MAX_Y-20,10, self.current_buffer[arg])
+
+    def debug_buffer(self):
+        with open("debug_editor", "w") as debug:
+            for line in self.current_buffer:
+                debug.write(line)
+            debug.write("EOF")
 
     def start(self):
-        normal_dispatcher = Dispatcher(self)
+        dispatcher = Dispatcher(self)
         self.screen.print_buffer()
         while self.running:
-            read = self.screen.stdscr.getkey()
-            normal_dispatcher.execute(read)
+            read = self.input.getkey()
+            dispatcher.execute(read)
             self.screen.draw(read) 
         self.screen.destructor() # needs cleaning to be more Pythonic
 
