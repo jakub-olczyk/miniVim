@@ -24,7 +24,6 @@ class Dispatcher(object):
     '''
     def __init__(self, editor):
         self.editor = editor
-        self.mode = self.editor.mode
         self.commands = {
                 'h': self.editor.current_buffer.cursor_left,
                 'l': self.editor.current_buffer.cursor_right,
@@ -34,7 +33,8 @@ class Dispatcher(object):
                 'd': self.editor.enter_delete,
                 'u': self.editor.undo_last,
                 'r': self.editor.redo_last,
-                ':': self.editor.settings
+                ':': self.editor.settings,
+                'p': self.editor.debug_buffer
             }
 
     @excepted
