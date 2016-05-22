@@ -25,7 +25,7 @@ class Buffer(object):
     Kinda mimics the work of pythonic list
     '''
 
-    def __init__(self, filename):
+    def __init__(self, filename=''):
         '''
         @filename: the name of the file to be opened, visit doc for open to know more
         '''
@@ -57,10 +57,7 @@ class Buffer(object):
         If there is no file_name it will prompt the user for the file_name 
         before saving it.
         '''
-        if self.file_name == '':
-            scr.addstr(MAX_Y-1,10,'name:')
-            self.file_name = str(scr.getstr(MAX_Y-1,15,1024))
-
+        assert (self.file_name != ''), "Filename cannot be empty!"
         with open('./'+self.file_name,'w+') as f:
             for line in self.main_buffer:
                 f.write(line)

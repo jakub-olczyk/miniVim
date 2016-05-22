@@ -14,6 +14,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 class iCommand(object): # pseudo-interface in Python
     def __init__(self, document, text, line, start, end):
         pass
