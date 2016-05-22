@@ -42,15 +42,15 @@ class Input(object):
             key = self.getch()
             if key == curses.ascii.ESC:
                 esc_pressed = True
-            elif key == curses.ascii.NL:
+            elif key == curses.ascii.NL: # newline
                 curr_y += 1
                 self.screen.stdscr.move(curr_y, curr_x)
                 input_str += '\n'
                 self.screen.refresh()
-            elif key == curses.ascii.BS:
+            elif key == curses.ascii.BS: # backspace
                 input_str = input_str[:-1]
                 self.screen.refresh()
-            else:
+            else: 
                 try:
                     input_str += chr(key)
                 except:
@@ -58,11 +58,6 @@ class Input(object):
         return input_str
 
 def input_sanitizer(text):
-    """
-    text: string, the user input that needs to be inserted to doc_buffer
-    doc_buffer: list
-    start_line: int, the line where we need to put the new lines
-    """
     sanitazed = []
     if text.count('\n') >= 1:
         sanitazed = str(text).split('\n')
@@ -70,11 +65,3 @@ def input_sanitizer(text):
     else: # when we put new string inside one
         sanitazed = [str(text)]
     return sanitazed
-
-def line_sanitizer(iterable):
-    to_add = [(0,[])]
-    for num, line in enumerate(iterable):
-        if line.count('\n') > 1:
-            more_lines = (num, input_sanitizer(line))
-            to_add.append(more_lines)
-    return to_add
