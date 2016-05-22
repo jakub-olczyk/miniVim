@@ -60,11 +60,12 @@ class Editor(object):
         
     @insert_mode
     def enter_insert(self): # FIX THIS : separate model and view
+        self.current_buffer.sanitize()
         mb = self.current_buffer
         cli = mb.current_line
         clt = mb.current_letter
-        s = self.input.get(cli, clt) # FIX this!!!
-        s = input_sanitizer(s) # now this is a list of NL ended strings
+        s = self.input.get(cli, clt) # WIP on FIXing THIS!
+        s = input_sanitizer(s)
         for n,line in enumerate(s):
             i = Insert(mb, line, cli+n, clt, clt + len(line))
             ed.execute(i)
@@ -105,13 +106,12 @@ class Editor(object):
 
     def debug_buffer(self):
         with open("debug_editor", "w") as debug:
-            for line in self.current_buffer:
-                debug.write(line)
+            debug.write(str(self.current_buffer))
             debug.write("EOF")
 
     def start(self):
         dispatcher = Dispatcher(self)
-        self.screen.print_buffer()
+        self.screen.draw('')
         while self.running:
             read = self.input.getkey()
             dispatcher.execute(read)
