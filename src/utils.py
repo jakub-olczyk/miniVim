@@ -31,8 +31,6 @@ def excepted(func):
             msg = str(e) + str(e[2])
             with open('vi.log', 'w+' if this.EXCEPTION_COUNTER == 0 else 'a') as log:
                 log.write(str(this.EXCEPTION_COUNTER) + ":" + msg+'\n')
-            # pass # Here should be some sort of logging given the amount of
-                 # functions that uses this decorator
             this.EXCEPTION_COUNTER += 1
     return func_wrap 
 

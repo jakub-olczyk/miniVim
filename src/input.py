@@ -28,34 +28,64 @@ class Input(object):
         self.screen.normal_mode()
         return user_input
 
-    def get(self, y, x):
+    def get(self, buff, y, x):
         ''' Main functionality of Input class '''
-        import curses.ascii
-        esc_pressed = False
-        input_str = ""
-        key = None
-        curr_y = y
-        curr_x = x
-        self.screen.stdscr.move(curr_y, curr_x)
-        my,mx = self.screen.getmaxyx()
-        while not esc_pressed:
-            key = self.getch()
-            if key == curses.ascii.ESC:
-                esc_pressed = True
-            elif key == curses.ascii.NL: # newline
-                curr_y += 1
-                self.screen.stdscr.move(curr_y, curr_x)
-                input_str += '\n'
-                self.screen.refresh()
-            elif key == curses.ascii.BS: # backspace
-                input_str = input_str[:-1]
-                self.screen.refresh()
-            else: 
-                try:
-                    input_str += chr(key)
-                except:
+        tmp_buff = buff[:]
+        with open("debug_input", "a") as debug:
+            import curses.ascii
+            if y == 0 and len(tmp_buff) == 0: # add first line if needed
+                tmp_buff.append('')
+            esc_pressed = False
+            key = None
+            curr_y = y
+            curr_x = x
+            self.screen.stdscr.move(curr_y, curr_x)
+            my, mx = self.screen.getmaxyx()
+            DB_MSG = "Przed pętlą tmp_buff: {}\n".format(str(tmp_buff))
+            debug.write(DB_MSG)
+            while not esc_pressed:
+                key = self.getch()
+                if key == curses.ascii.ESC:
+                    esc_pressed = True
+
+                elif key == curses.ascii.NL: # newline
+                    # Add line to tmp_buff
+                    len_line = len(tmp_buff[curr_y])
+
+                    if len_line == curr_x:
+                        tmp_buff.insert(curr_y+1, '')
+                    else:
+                        line_to_split = tmp_buff[curr_y][:]
+                        stays = line_to_split[curr_x:]
+                        new = line_to_split[:curr_x]
+                        tmp_buff[curr_y] = stays
+                        tmp_buff.insert(curr_y, new)
+
+                    curr_y += 1
+                    curr_x = 0
+                    self.screen.stdscr.move(curr_y, curr_x)
+                    self.screen.refresh()
+                    DB_MSG = "newline tmp_buff: {}\n".format(str(tmp_buff))
+                    debug.write(DB_MSG)
+
+                elif key == 263: # backspace
+                    new = tmp_buff[curr_y][:-1]
+                    curr_x -= 1
+                    tmp_buff[curr_y] = new
+                    self.screen.refresh()
+                    DB_MSG = "backspace tmp_buff: {}\n".format(str(tmp_buff))
+                    debug.write(DB_MSG)
+                elif key in range(0,255): #add one character
+                    try:
+                        tmp_buff[curr_y] = tmp_buff[curr_y][:curr_x] + chr(key) + tmp_buff[curr_y][curr_x:]
+                        curr_x += 1
+                    except:
+                        pass
+                    DB_MSG = "newchar: {} tmp_buff: {}\n".format(chr(key), str(tmp_buff))
+                    debug.write(DB_MSG)
+                else:
                     pass
-        return input_str
+        return tmp_buff
 
 def input_sanitizer(text):
     sanitazed = []

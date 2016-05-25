@@ -60,17 +60,16 @@ class Editor(object):
         
     @insert_mode
     def enter_insert(self): # FIX THIS : separate model and view
-        self.current_buffer.sanitize()
+        #self.current_buffer.sanitize()
         mb = self.current_buffer
         cli = mb.current_line
         clt = mb.current_letter
-        s = self.input.get(cli, clt) # WIP on FIXing THIS!
-        s = input_sanitizer(s)
-        for n,line in enumerate(s):
-            i = Insert(mb, line, cli+n, clt, clt + len(line))
-            ed.execute(i)
-        self.current_buffer.current_letter += len(s[-1])
-        self.current_buffer.current_line += len(s)
+        new_buff = self.input.get(mb, cli, clt) # WIP on FIXing THIS!
+        #s = input_sanitizer(s)
+        i = Insert(mb, new_buff)
+        ed.execute(i)
+        #self.current_buffer.current_letter += len(s[-1])
+        #self.current_buffer.current_line += len(s)
 
     def enter_delete(self):
         cmd = Delete(self.current_buffer)

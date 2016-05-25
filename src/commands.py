@@ -26,48 +26,42 @@ class iCommand(object): # pseudo-interface in Python
 class Insert(iCommand):
     ''' Acts similarly to Vi instert mode, but not quite :) '''
 
-    def __init__(self, document, text, line, start, end):
+    def __init__(self, old_buff, new_buff):
         '''
-        @document: handle for the buffer
-        @text: actual change text
-        @line: the line where insert was done 
-        @start: the starting position of change
-        @end: the ending position of change
+        @old_buff: handle for the buffer
+        @new_buff: actual change text
+        @changes: list of tuples of (numline, old, new)
+                  where numline = the index of line changed
+                        old = old content of line
+                        new = new content of line
         '''
-        self.text = text
-        self.changed = ''
-        self.document = document
-        self.line = line
-        self.start = start 
-        self.end = end
+        self.document = old_buff
+        self.new_buff = new_buff
+        self.changes = []
     
     def execute(self):
-        def inserter(src, trgt, start):
-            '''
-            @src   : string
-            @trgt  : string
-            @start : number
-            @return: new string based on src with trgt string in between the point start
-            '''
-            result = ''
-            result += src[:start]
-            result += trgt
-            result += src[start:]
-            return result
-        try:
-            self.changed = str(self.document[self.line]) 
-        except:
-            self.document.append('')
-            self.changed = self.document[self.line]
+        # make both same size
+        longer, shorter = self.document, self.new_buff #references yay!
+        if len(self.document) < len(self.new_buff):
+            longer, shorter = shorter, longer
+        diff = len(longer) - len(shorter)
 
-        new_line = self.changed
-        new_line = inserter(new_line, self.text, self.start) 
-        self.document[self.line] = new_line
+        for i in xrange(diff):
+            shorter.append('')
+
+        # determine the changes
+        for n, old in enumerate(self.document):
+            if old != self.new_buff[n]: # add only differences
+                self.changes.append(tuple([n, old, self.new_buff[n]]))
+
+        # add the changes
+        for i, old, new in self.changes:
+            self.document[i] = new
 
     def undo(self):
-        self.document[self.line] = self.changed
-        if self.changed == '':
-            self.document.pop()
+        # revert the changes
+        for n, old, new in self.changes:
+            self.document[n] = old
 
 class Delete(iCommand):
     ''' Delete from cursor to end of line.  '''
@@ -81,11 +75,11 @@ class Delete(iCommand):
 
     def execute(self):
         try:
-            self.text = self.document[self.line][self.start:]
-            new_line = self.document[self.line][:self.start]
-            self.document[self.line] = new_line
+            self.text = self.buffer[self.line][self.start:]
+            new_line = self.buffer[self.line][:self.start]
+            self.buffer[self.line] = new_line
         except:
             self.text = ''
 
     def undo(self):
-        self.document[self.line] += self.text
+        self.buffer[self.line] += self.text
