@@ -55,6 +55,11 @@ class Buffer(object):
         ''' interface to underlying structure of list '''
         self.main_buffer.append(string)
 
+    def remove(self, value):
+        ''' remove first occurance of value. Raises ValueError when no value is
+        present '''
+        self.main_buffer.remove(value)
+
     def sanitize(self):
         sanitized = []
         for line in self.main_buffer:
@@ -71,7 +76,7 @@ class Buffer(object):
         assert (self.file_name != ''), "Filename cannot be empty!"
         with open('./'+self.file_name,'w+') as f:
             for line in self.main_buffer:
-                f.write(line)
+                f.write(line+'\n')
 
     @excepted
     def open_file(self, filename):
