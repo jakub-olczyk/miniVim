@@ -1,3 +1,0 @@
-0:(<type 'exceptions.KeyError'>, KeyError('I',), <traceback object at 0x7fd2b2a5ca28>)<traceback object at 0x7fd2b2a5ca28>
-1:(<type 'exceptions.KeyError'>, KeyError('o',), <traceback object at 0x7fd2b2a5cb48>)<traceback object at 0x7fd2b2a5cb48>
-2:(<type 'exceptions.KeyError'>, KeyError(' ',), <traceback object at 0x7fd2b2a5cbd8>)<traceback object at 0x7fd2b2a5cbd8>
