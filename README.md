@@ -1,5 +1,4 @@
-miniVim
-=======
+# miniVim
 
 Bardzo prosty edytor tekstowy zainspirowany działaniem klasycznego edytora Vi.
 Napisany jako projekt zaliczeniowy z przedmiotu "Wzorce projektowe" z
@@ -14,3 +13,60 @@ Wzorce projektowe wykorzystanie w projekcie:
 * Most
 * Dekorator
 
+## Obsługa
+
+Poruszanie się po buforze odbywa się za pomocą klawiszy:
+
+		    ^
+	< h  j  k  l >
+		 v
+
+Zgodnie z tym co na obrazku powyżej oraz sposobem poruszania się w oryginalnym
+Vi.
+
+### Wprowadzanie tekstu
+
+Aby wprowadzić tekst można skorzystać z komend `i`, `I`, `A` oraz `o`, które
+działają tak jak w Vi.
+
+* `i`, `I` wchodzą w tryb Insert. `I` przeskakuje do początku linii przed wejściem.
+  `i` - pozwala na wejście w tryb wprowadzania tekstu pod kursorem.
+* `A` pozwala na wprowadzenie tekstu po przeskoku do końca linii.
+* `o` przeskakuje do następnej linii i wchodzi w tryb Insert
+
+### Usuwanie tekstu
+
+Służą do tego polecenia `d` oraz `D`. `D` usuwa tekst od kursora do końca
+linii. Natomiast `d` potrzebuje jeszcze jednego argumentu przed wykonaniem, a
+mianowicie kierunku. Zgodnie z komendami do poruszania.
+
+### Przykład. Usuwanie poziome.
+
+	Przykladowa linijka tekstu.
+	    ^
+(`^` wskazuje pozycję kursora w linii).
+
+Można teraz wykonać dwa polecenia zmieniające obecną linijkę:
+1. `dl` - usunie literę, na którą wskazuje kursor.
+2. `dh` - usunie literę z przed kursora.
+
+Po wykonaniu 1. 
+
+	Przyladowa linijka tekstu.
+	    ^
+
+Po wykonaniu 2.
+
+	Przkladowa linijka tekstu.
+	   ^
+
+### Przykład. Usuwanie pionowe.
+
+	rest1
+	rest2 <--
+	rest3
+
+(`<--` wskazuje linię, w której jest kursor)
+
+1. `dj` - usuwa obecną linię oraz jedną poniżej
+2. `dk` - usuwa obecną linię oraz jedną powyżej

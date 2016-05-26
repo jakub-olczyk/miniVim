@@ -33,6 +33,7 @@ class Dispatcher(object):
                 'd': self.editor.enter_delete,
                 'u': self.editor.undo_last,
                 'r': self.editor.redo_last,
+                's': self.editor.enter_replace,
                 ':': self.editor.settings,
                 'p': self.editor.debug_buffer
             }
