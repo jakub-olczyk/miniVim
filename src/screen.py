@@ -88,12 +88,11 @@ class Screen(object):
         clears the screen
         then draws the cursor position in current buffer
         '''
-
         self.clear()
         curr_line = self.current_buffer.current_line
         curr_letter = self.current_buffer.current_letter
         positon = '{},{}'.format(curr_line,curr_letter)
-        self.stdscr.addstr(self.MAX_Y-1, self.MAX_X-5, positon, curses.A_REVERSE)
+        self.stdscr.addstr(self.MAX_Y-1, self.MAX_X-8, positon, curses.A_REVERSE)
 
     def draw_last_pressed(self, read):
         ''' show last pressed character on the bar '''

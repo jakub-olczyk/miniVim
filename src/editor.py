@@ -60,23 +60,18 @@ class Editor(object):
         
     @insert_mode
     def enter_insert(self): # FIX THIS : separate model and view
-        #self.current_buffer.sanitize()
-        mb = self.current_buffer
-        cli = mb.current_line
-        clt = mb.current_letter
-        new_buff = self.input.get(mb, cli, clt) # WIP on FIXing THIS!
-        #s = input_sanitizer(s)
-        i = Insert(mb, new_buff)
-        ed.execute(i)
-        #self.current_buffer.current_letter += len(s[-1])
-        #self.current_buffer.current_line += len(s)
+        buff = self.current_buffer
+        cursor_y = buff.current_line
+        cursor_x = buff.current_letter
+        new_buff = self.input.get(buff, cursor_y, cursor_x) 
+        i = Insert(buff, new_buff)
+        self.execute(i)
 
     def enter_delete(self):
         cmd = Delete(self.current_buffer)
         self.execute(cmd)
 
     def settings(self):
-        #self.screen.option_mode() # enter option mode and show it by printing prompt ":"
         s = self.input.prompt_bar(":")
 
         if s.startswith('q'): #exit and discard
@@ -85,23 +80,28 @@ class Editor(object):
         if s.startswith('w'): #saving command
             if self.current_buffer.file_name == '':
                 self.current_buffer.file_name = self.input.prompt_bar('name:')
-            self.current_buffer.save_file(self.screen.stdscr) #broken
+            self.current_buffer.save_file(self.screen.stdscr) 
             self.screen.print_bar(self.current_buffer.file_name + ': Saved')
 
         if s.startswith('x'): #save and exit
-            self.stdscr.addstr(self.screen.MAX_Y-1,0,'Saving...')
-            self.current_buffer.save_file(stdscr) #broken
+            self.screen.stdscr.addstr(self.screen.MAX_Y-1,0,'Saving...')
+            self.current_buffer.save_file(stdscr)
             self.stdscr.refresh()
             self.running = False
 
         if s.startswith('e'): #edit file
-            filename = s.split(' ')[1] # FIX : no argument?
+            args = s.split(' ')
+            filename = ''
+            try:
+                filename = args[1]
+            except:
+                pass
             self.current_buffer.open_file(filename)
 
         if s.startswith('p'):
             cmd, arg = s.split(' ')
             arg = int(arg)
-            stdscr.addstr(self.screen.MAX_Y-20,10, self.current_buffer[arg])
+            self.screen.stdscr.addstr(self.screen.MAX_Y-20,10, self.current_buffer[arg])
 
     def debug_buffer(self):
         with open("debug_editor", "w") as debug:
@@ -116,7 +116,3 @@ class Editor(object):
             dispatcher.execute(read)
             self.screen.draw(read) 
         self.screen.destructor() # needs cleaning to be more Pythonic
-
-if __name__ == '__main__':
-    ed = Editor()
-    ed.start()

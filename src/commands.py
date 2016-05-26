@@ -16,7 +16,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class iCommand(object): # pseudo-interface in Python
-    def __init__(self, document, text, line, start, end):
+    def __init__(self, buff, new_buff):
         pass
     def execute(self):
         pass
@@ -83,3 +83,22 @@ class Delete(iCommand):
 
     def undo(self):
         self.buffer[self.line] += self.text
+
+class Replace(iCommand):
+    ''' Replace first occurance of string with another one in current line'''
+
+    def __init__(self, buff, old_text, new_text, line_num):
+        self.buffer = buff # handle for the buffer 
+        self.old_text = old_text
+        self.new_text = new_text
+        self.line_num = line_num
+        self.old_line = ''
+        self.new_line = ''
+
+    def execute(self):
+        self.old_line = self.buffer[self.line_num]
+        self.new_line = self.old_line.replace(self.old_text, self.new_text)
+        self.buffer[self.line_num] = self.new_line
+
+    def undo(self):
+        self.buffer[self.line_num] = self.old_line
