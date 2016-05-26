@@ -17,7 +17,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from utils import excepted
-from input import input_sanitizer
 
 class Buffer(object):
     ''' This class represents single file open in the editor. It is here for
@@ -59,13 +58,6 @@ class Buffer(object):
         ''' remove first occurance of value. Raises ValueError when no value is
         present '''
         self.main_buffer.remove(value)
-
-    def sanitize(self):
-        sanitized = []
-        for line in self.main_buffer:
-            for l in input_sanitizer(line) :
-                sanitized.append(l)
-        self.main_buffer = sanitized
 
     @excepted
     def save_file(self, scr):
