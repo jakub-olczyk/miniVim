@@ -8,3 +8,9 @@ wykorzytaniem:
 * modułu do Pythona `curses` 
 * oryginalnego Vima
 
+Wzorce projektowe wykorzystanie w projekcie:
+* Polecenie
+* Singleton 
+* Most
+* Dekorator
+

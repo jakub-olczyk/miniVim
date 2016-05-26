@@ -3,7 +3,7 @@
 all: run clean
 
 run:
-	python editor.py 
+	python main.py 
 
 clean:
 	rm -f *.pyc
