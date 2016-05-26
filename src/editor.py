@@ -59,20 +59,54 @@ class Editor(object):
         self.command_stack.append(command)
         
     @insert_mode
-    def enter_insert(self): # FIX THIS : separate model and view
+    def insert(self): 
         buff = self.current_buffer
         cursor_y = buff.current_line
         cursor_x = buff.current_letter
-        new_buff = self.input.get(buff, cursor_y, cursor_x) 
+        new_buff, cursor_y, cursor_x = self.input.get(buff, cursor_y, cursor_x) 
+        self.current_buffer.current_line = cursor_y
+        self.current_buffer.current_letter = cursor_x
         i = Insert(buff, new_buff)
         self.execute(i)
 
-    def enter_delete(self):
-        cmd = Delete(self.current_buffer)
+    @insert_mode
+    def insert_start(self):
+        buff = self.current_buffer
+        cur_y = buff.current_line
+        cur_x = buff.current_letter
+        cur_x = 0
+        new_buff, cur_y, cur_x = self.input.get(buff, cur_y, cur_x)
+        self.current_buffer.current_line = cur_y
+        self.current_buffer.current_letter = cur_x
+        i = Insert(buff, new_buff)
+        self.execute(i)
+
+    @insert_mode
+    def insert_end(self):
+        buff = self.current_buffer
+        cur_y = buff.current_line
+        cur_x = buff.current_letter
+        cur_x = len(buff[cur_y])
+        new_buff, cur_y, cur_x = self.input.get(buff, cur_y, cur_x)
+        self.current_buffer.current_line = cur_y
+        self.current_buffer.current_letter = cur_x
+        i = Insert(buff, new_buff)
+        self.execute(i)
+
+    def delete_move(self):
+        buff = self.current_buffer
+        curr_line = buff.current_line
+        curr_letter = buff.current_letter
+        letter = self.input.getkey()
+        d = Delete(buff, letter)
+        self.execute(d)
+
+    def delete_to_end(self):
+        cmd = Delete(self.current_buffer, 'D') 
         self.execute(cmd)
 
-    def enter_replace(self):
-        old, new = self.input.prompt_bar("s/").split('/')
+    def replace(self):
+        old, new = self.input.prompt_bar('s/').split('/')
         cmd = Replace(self.current_buffer, old, new, self.current_buffer.current_line)
         self.execute(cmd)
 
@@ -103,7 +137,7 @@ class Editor(object):
                 pass
             self.current_buffer.open_file(filename)
 
-        if s.startswith('p'):
+        if s.startswith('p'): # undocumented feature used for debugging
             cmd, arg = s.split(' ')
             arg = int(arg)
             self.screen.stdscr.addstr(self.screen.MAX_Y-20,10, self.current_buffer[arg])

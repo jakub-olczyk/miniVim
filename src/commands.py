@@ -64,22 +64,29 @@ class Insert(iCommand):
             self.document[n] = old
 
 class Delete(iCommand):
-    ''' Delete from cursor to end of line.  '''
+    ''' Delete depending on the other operand'''
 
-    def __init__(self, buffer, text=None, end=None):
+    def __init__(self, buffer, letter):
         self.buffer = buffer
-        self.text = text #deleted text
         self.line = self.buffer.current_line
         self.start = self.buffer.current_letter
-        self.end = end
+        self.text = '' # deleted text
+        self.letter = letter # the command used
 
-    def execute(self):
-        try:
-            self.text = self.buffer[self.line][self.start:]
-            new_line = self.buffer[self.line][:self.start]
-            self.buffer[self.line] = new_line
-        except:
-            self.text = ''
+    def execute(self): #FIXME
+        if self.letter in set("hjkldD"):
+            if self.letter == 'D':
+                try:
+                    self.text = self.buffer[self.line][self.start:]
+                    new_line = self.buffer[self.line][:self.start]
+                    self.buffer[self.line] = new_line
+                except:
+                    self.text = ''
+            else:
+                    pass
+        else:# not in set(hjkldD)
+            pass
+
 
     def undo(self):
         self.buffer[self.line] += self.text

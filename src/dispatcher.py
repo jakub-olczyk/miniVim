@@ -19,8 +19,8 @@ from utils import excepted
 
 class Dispatcher(object):
     '''
-    Analizer for keys pressed that is aware of the mode of operation and acts 
-    accordingly.
+    A substitute to tree of `if elif else`, with logging capabilities due to
+    exepted decorator.
     '''
     def __init__(self, editor):
         self.editor = editor
@@ -29,11 +29,14 @@ class Dispatcher(object):
                 'l': self.editor.current_buffer.cursor_right,
                 'j': self.editor.current_buffer.cursor_down,
                 'k': self.editor.current_buffer.cursor_up,
-                'i': self.editor.enter_insert,
-                'd': self.editor.enter_delete,
+                'i': self.editor.insert,
+                'I': self.editor.insert_start,
+                'A': self.editor.insert_end,
+                'd': self.editor.delete_move,
+                'D': self.editor.delete_to_end,
+                's': self.editor.replace,
                 'u': self.editor.undo_last,
                 'r': self.editor.redo_last,
-                's': self.editor.enter_replace,
                 ':': self.editor.settings,
                 'p': self.editor.debug_buffer
             }

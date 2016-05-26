@@ -40,7 +40,7 @@ Służą do tego polecenia `d` oraz `D`. `D` usuwa tekst od kursora do końca
 linii. Natomiast `d` potrzebuje jeszcze jednego argumentu przed wykonaniem, a
 mianowicie kierunku. Zgodnie z komendami do poruszania.
 
-### Przykład. Usuwanie poziome.
+#### Przykład. Usuwanie poziome
 
 	Przykladowa linijka tekstu.
 	    ^
@@ -60,7 +60,7 @@ Po wykonaniu 2.
 	Przkladowa linijka tekstu.
 	   ^
 
-### Przykład. Usuwanie pionowe.
+#### Przykład. Usuwanie pionowe
 
 	rest1
 	rest2 <--
@@ -70,3 +70,13 @@ Po wykonaniu 2.
 
 1. `dj` - usuwa obecną linię oraz jedną poniżej
 2. `dk` - usuwa obecną linię oraz jedną powyżej
+
+### Podmiana tekstu
+
+Komenda, której nie ma w oryginalnym Vi -- `s` służy do podmiany tekstu w
+obecnej linii. Po jej naciśnięciu w pasku na dole ekranu pojawia się zachętka
+`s/`. Poprawna składnia komendy wygląda następująco:
+
+	s/<stary_tekst>/<nowy_tekst>/
+
+Przy czym ostatni `/` nie jest wymagany.

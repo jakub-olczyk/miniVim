@@ -65,7 +65,8 @@ class Screen(object):
         ''' prints the currently open buffer ''' 
 
         for i, line in enumerate(self.current_buffer):
-            self.stdscr.addstr(i, 0, line)
+            if i < self.MAX_Y-1:
+                self.stdscr.addstr(i, 0, line)
         self.refresh()
         # fill the screen with '~' if file is shorter then maximal lines on
         # screen

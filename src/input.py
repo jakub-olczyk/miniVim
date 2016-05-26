@@ -76,7 +76,7 @@ class Input(object):
                     pass
             else: # non-ascii characters or special keys
                 pass
-        return tmp_buff
+        return (tmp_buff, curr_y, curr_x)
 
 def input_sanitizer(text):
     sanitazed = []
