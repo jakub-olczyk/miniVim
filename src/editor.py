@@ -16,7 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from commands import Insert, Delete
+from commands import Insert, Delete, Replace
 from utils import excepted
 from dispatcher import Dispatcher
 from buffer import Buffer
@@ -69,6 +69,11 @@ class Editor(object):
 
     def enter_delete(self):
         cmd = Delete(self.current_buffer)
+        self.execute(cmd)
+
+    def enter_replace(self):
+        old, new = self.input.prompt_bar("s/").split('/')
+        cmd = Replace(self.current_buffer, old, new, self.current_buffer.current_line)
         self.execute(cmd)
 
     def settings(self):
