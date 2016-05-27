@@ -54,6 +54,9 @@ class Buffer(object):
         ''' interface to underlying structure of list '''
         self.main_buffer.append(string)
 
+    def insert(self, index, value):
+        self.main_buffer.insert(index, value)
+
     def remove(self, value):
         ''' remove first occurance of value. Raises ValueError when no value is
         present '''

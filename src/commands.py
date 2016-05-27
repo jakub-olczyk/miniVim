@@ -73,23 +73,43 @@ class Delete(iCommand):
         self.text = '' # deleted text
         self.letter = letter # the command used
 
-    def execute(self): #FIXME
-        if self.letter in set("hjkldD"):
-            if self.letter == 'D':
+    def execute(self): 
+        if self.letter in set("hldD"):
+            if self.letter == 'D': # delete to the end of line
                 try:
                     self.text = self.buffer[self.line][self.start:]
                     new_line = self.buffer[self.line][:self.start]
                     self.buffer[self.line] = new_line
                 except:
                     self.text = ''
+            elif self.letter == 'd': # delete current line
+                self.text = self.buffer[self.line][:]
+                self.buffer[self.line] = None
+                self.buffer.remove(None)
+            elif self.letter == 'l': #delete current letter
+                x = self.buffer.current_letter
+                self.text = (x, self.buffer[self.line][x]) # we need to get the position in line
+                self.buffer[self.line] = self.buffer[self.line][:x] + self.buffer[self.line][x+1:]
+            elif self.letter == 'h': #delete one before current letter
+                x = self.buffer.current_letter-1
+                self.text = (x, self.buffer[self.line][x]) # we need to get the position in line
+                self.buffer[self.line] = self.buffer[self.line][:x] + self.buffer[self.line][x+1:]
             else:
-                    pass
+                pass
         else:# not in set(hjkldD)
             pass
 
 
     def undo(self):
-        self.buffer[self.line] += self.text
+        if self.letter == 'D':
+            self.buffer[self.line] += self.text
+        elif self.letter == 'd':
+            self.buffer.insert(self.line, self.text)
+        elif self.letter == 'l' or self.letter == 'h':
+            x, letter = self.text
+            self.buffer[self.line] = self.buffer[self.line][:x] + letter + self.buffer[self.line][x:]
+        else:
+            pass
 
 class Replace(iCommand):
     ''' Replace first occurance of string with another one in current line'''

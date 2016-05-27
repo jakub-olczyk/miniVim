@@ -60,17 +60,6 @@ Po wykonaniu 2.
 	Przkladowa linijka tekstu.
 	   ^
 
-#### Przykład. Usuwanie pionowe
-
-	rest1
-	rest2 <--
-	rest3
-
-(`<--` wskazuje linię, w której jest kursor)
-
-1. `dj` - usuwa obecną linię oraz jedną poniżej
-2. `dk` - usuwa obecną linię oraz jedną powyżej
-
 ### Podmiana tekstu
 
 Komenda, której nie ma w oryginalnym Vi -- `s` służy do podmiany tekstu w
