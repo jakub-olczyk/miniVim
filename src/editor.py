@@ -93,6 +93,19 @@ class Editor(object):
         i = Insert(buff, new_buff)
         self.execute(i)
 
+    @insert_mode
+    def insert_below(self):
+        buff = self.current_buffer
+        buff.append('')
+        y = buff.current_line + (1 if len(buff) != 1 else 0)
+        x = len(buff[y])
+        new_buff, cur_y, cur_x = self.input.get(buff, y, x)
+        self.current_buffer.current_line = cur_y
+        self.current_buffer.current_letter = cur_x
+        i = Insert(buff, new_buff)
+        self.execute(i)
+        self.debug_buffer()
+
     def delete_move(self):
         buff = self.current_buffer
         curr_line = buff.current_line

@@ -32,6 +32,7 @@ class Dispatcher(object):
                 'i': self.editor.insert,
                 'I': self.editor.insert_start,
                 'A': self.editor.insert_end,
+                'o': self.editor.insert_below,
                 'd': self.editor.delete_move,
                 'D': self.editor.delete_to_end,
                 's': self.editor.replace,

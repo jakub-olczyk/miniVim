@@ -40,7 +40,8 @@ class Screen(object):
         curses.endwin()
 
     def draw(self, read):
-        ''' Main drawing routine '''
+        ''' Main drawing routine 
+            read is used to display lastpressed character'''
         self.draw_cursor_position() # show y,x position of cursor on the screen
         self.draw_last_pressed(read) # display last character pressed'
         self.print_buffer() # display the contents of buffer
