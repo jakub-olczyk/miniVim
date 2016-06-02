@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # coding=utf8
-# 
+#
 #    miniVim
-#    Copyright (c) Jakub Olczyk 
+#    Copyright (c) Jakub Olczyk
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -15,6 +15,8 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+""" This is the module with main model for file that is being worked on """
 
 from utils import excepted
 
@@ -51,46 +53,51 @@ class Buffer(object):
         self.main_buffer[index] = value
 
     def append(self, string):
-        ''' interface to underlying structure of list '''
+        """ interface to underlying structure of list """
         self.main_buffer.append(string)
 
     def insert(self, index, value):
+        """ interface to underlying list """
         self.main_buffer.insert(index, value)
 
     def remove(self, value):
-        ''' remove first occurance of value. Raises ValueError when no value is
-        present '''
+        """ remove first occurance of value. Raises ValueError when no value is
+        present """
         self.main_buffer.remove(value)
 
     @excepted
-    def save_file(self, scr):
-        '''
-        If there is no file_name it will prompt the user for the file_name 
+    def save_file(self):
+        """
+        If there is no file_name it will prompt the user for the file_name
         before saving it.
-        '''
+        """
         assert (self.file_name != ''), "Filename cannot be empty!"
-        with open('./'+self.file_name,'w+') as f:
+        with open('./'+self.file_name, 'w+') as _file:
             for line in self.main_buffer:
-                f.write(line+'\n')
+                _file.write(line+'\n')
 
     @excepted
     def open_file(self, filename):
+        """ A method used to load file to RAM """
         self.file_name = filename
-        with open(filename, 'r') as f:
-            self.main_buffer = f.readlines()
-        
+        with open(filename, 'r') as _file:
+            self.main_buffer = _file.readlines()
+
     @excepted
     def cursor_left(self):
+        """ Move cursor one character to the left """
         if self.current_letter > 0:
             self.current_letter -= 1
 
     @excepted
     def cursor_right(self):
+        """ Move cursor one character to the right """
         if self.current_letter < len(self.main_buffer[self.current_line]):
             self.current_letter += 1
 
     @excepted
     def cursor_up(self):
+        """ Move cursor one line up """
         if self.current_line > 0:
             self.current_line -= 1
         if self.current_letter > len(self.main_buffer[self.current_line]):
@@ -98,7 +105,8 @@ class Buffer(object):
 
     @excepted
     def cursor_down(self):
-        if self.current_line < len(self.main_buffer) - 1 :
+        """ Move cursor one line down """
+        if self.current_line < len(self.main_buffer) - 1:
             self.current_line += 1
         if self.current_letter > len(self.main_buffer[self.current_line]):
             self.current_letter = len(self.main_buffer[self.current_line])
@@ -107,10 +115,10 @@ class Buffer(object):
         """ Jump one word forward to the beginning of next word """
         line = self.main_buffer[self.current_line]
         next_word = 0
-        x = self.current_letter
+        x_pos = self.current_letter
         found_next = False
-        for i in xrange(x,len(line)):
-            if line[i] not in set(' \t\n'):
+        for i in xrange(x_pos, len(line)):
+            if line[i] not in set(' \t\n,.'):
                 if found_next: # jeśli to pierwsza litera w słowie
                     next_word = i
                     break # zakończ bo chcemy tylko dolecieć do następnego słowa
@@ -122,11 +130,11 @@ class Buffer(object):
         """ Jump one word backward to the beginning """
         line = self.main_buffer[self.current_line]
         prev_word = 0
-        x = self.current_letter
+        x_pos = self.current_letter
         ws_count = 0
         first = True
-        for i in xrange(x,0,-1): #poruszamy się w tył od x do 0
-            if line[i] in set(' \n\t'):
+        for i in xrange(x_pos, 0, -1): #poruszamy się w tył od x do 0
+            if line[i] in set(' \n\t,.'):
                 if first:
                     ws_count += 1
                     first = False

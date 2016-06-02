@@ -21,20 +21,20 @@ from utils import excepted
 from dispatcher import Dispatcher
 from buffer import Buffer
 from screen import Screen, insert_mode
-from input import Input,  input_sanitizer
+from input import Input
 
 ''' Mega uproszczony Vim stworzony jako projekt zaliczeniowy '''
 
 class Editor(object):
     ''' 
     This class represents the editor. 
-    It is responsible of keeping track of open files and commands issued.
+    It is responsible of keeping track of open buffers and commands issued.
     '''
     def __init__(self):
         self.running = True
 
         self.buffers = [Buffer('')] # the list of open buffers
-        self.current_buffer = self.buffers[0]
+        self.current_buffer = self.buffers[0] # first of the buffers
 
         self.screen = Screen(self.current_buffer)
         self.input = Input()
@@ -132,12 +132,12 @@ class Editor(object):
         if s.startswith('w'): #saving command
             if self.current_buffer.file_name == '':
                 self.current_buffer.file_name = self.input.prompt_bar('name:')
-            self.current_buffer.save_file(self.screen.stdscr) 
+            self.current_buffer.save_file() 
             self.screen.print_bar(self.current_buffer.file_name + ': Saved')
 
         if s.startswith('x'): #save and exit
             self.screen.stdscr.addstr(self.screen.MAX_Y-1,0,'Saving...')
-            self.current_buffer.save_file(stdscr)
+            self.current_buffer.save_file()
             self.stdscr.refresh()
             self.running = False
 

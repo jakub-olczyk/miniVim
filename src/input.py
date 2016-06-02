@@ -1,88 +1,79 @@
 #!/usr/bin/env python
 # coding=utf8
-# 
-# Copyright (c) Jakub Olczyk 
+#
+# Copyright (c) Jakub Olczyk
 # Published under GNU General Public License version 2 or above
 # For full text of the license visit www.gnu.org/licenses/gpl.html
+
+""" Main module with the abstraction for getting input from user """
 
 from utils import Singleton
 from screen import Screen
 
 @Singleton
 class Input(object):
-    ''' Most do komunikacji z częścią `curses' odpowiedzialną za komunikację z 
+    ''' Most do komunikacji z częścią `curses' odpowiedzialną za komunikację z
         użytkownikiem '''
 
     def __init__(self):
         self.screen = Screen() # łatwiejsze dobranie się do istniejącego już Singletona
 
     def getkey(self):
+        """ Get key in letter representation from Curses module """
         return self.screen.stdscr.getkey()
 
     def getch(self):
+        """ Get key as numeric value; might not be in range [0, 255] """
         return self.screen.stdscr.getch()
 
     def prompt_bar(self, message):
+        """ Show prompt and get the user input """
         self.screen.print_bar(message)
         user_input = self.screen.stdscr.getstr(self.screen.MAX_Y-1, len(message), 1024)
         self.screen.normal_mode()
         return user_input
 
-    def get(self, buff, y, x):
-        ''' Main functionality of Input class '''
-        tmp_buff = buff[:]
+    def get(self, buff, y_pos, x_pos):
+        ''' main functionality of input class '''
+        tmp_buff = buff[:] # we want to work on copy
         import curses.ascii
-        if y == 0 and len(tmp_buff) == 0: # add first line if needed
+        if y_pos == 0 and len(tmp_buff) == 0: # add first line if needed
             tmp_buff.append('')
         esc_pressed = False
         key = None
-        curr_y = y
-        curr_x = x
-        self.screen.stdscr.move(curr_y, curr_x)
-        my, mx = self.screen.getmaxyx()
+        self.screen.stdscr.move(y_pos, x_pos)
         while not esc_pressed:
             key = self.getch()
             if key == curses.ascii.ESC:
                 esc_pressed = True
-
             elif key == curses.ascii.NL: # newline
-                # Add line to tmp_buff
-                len_line = len(tmp_buff[curr_y])
+                # add line to tmp_buff
+                len_line = len(tmp_buff[y_pos])
 
-                if len_line == curr_x:
-                    tmp_buff.insert(curr_y+1, '')
+                if len_line == x_pos:
+                    tmp_buff.insert(y_pos+1, '')
                 else:
-                    line_to_split = tmp_buff[curr_y][:]
-                    stays = line_to_split[curr_x:]
-                    new = line_to_split[:curr_x]
-                    tmp_buff[curr_y] = stays
-                    tmp_buff.insert(curr_y, new)
-
-                curr_y += 1
-                curr_x = 0
-                self.screen.stdscr.move(curr_y, curr_x)
+                    line_to_split = tmp_buff[y_pos][:]
+                    stays = line_to_split[x_pos:]
+                    new = line_to_split[:x_pos]
+                    tmp_buff[y_pos] = stays
+                    tmp_buff.insert(y_pos, new)
+                y_pos += 1
+                x_pos = 0
+                self.screen.stdscr.move(y_pos, x_pos)
                 self.screen.refresh()
 
             elif key == 263: # backspace : the curses.ascii.bs didn't work :(
-                new = tmp_buff[curr_y][:curr_x-1] + tmp_buff[curr_y][curr_x:]
-                curr_x -= 1
-                tmp_buff[curr_y] = new
+                new = tmp_buff[y_pos][:x_pos-1] + tmp_buff[y_pos][x_pos:]
+                x_pos -= 1
+                tmp_buff[y_pos] = new
                 self.screen.refresh()
-            elif key in range(0,255): #add one character
+            elif key in range(0, 255): # add one character, bc ascii
                 try:
-                    tmp_buff[curr_y] = tmp_buff[curr_y][:curr_x] + chr(key) + tmp_buff[curr_y][curr_x:]
-                    curr_x += 1
-                except:
+                    tmp_buff[y_pos] = tmp_buff[y_pos][:x_pos] + chr(key) + tmp_buff[y_pos][x_pos:]
+                    x_pos += 1
+                except StandardError:
                     pass
             else: # non-ascii characters or special keys
                 pass
-        return (tmp_buff, curr_y, curr_x)
-
-def input_sanitizer(text):
-    sanitazed = []
-    if text.count('\n') >= 1:
-        sanitazed = str(text).split('\n')
-        sanitazed = [line+'\n' for line in sanitazed]
-    else: # when we put new string inside one
-        sanitazed = [str(text)]
-    return sanitazed
+        return (tmp_buff, y_pos, x_pos)

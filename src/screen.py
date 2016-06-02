@@ -22,8 +22,8 @@ class Screen(object):
     ''' This is abstraction of the user interface. It uses the curses library for
     displaying actual stuff on the screen.'''
 
-    def __init__(self, buffer):
-        self.current_buffer = buffer
+    def __init__(self, buff=None):
+        self.current_buffer = buff
         self.stdscr = curses.initscr()
         self.MAX_Y, self.MAX_X = self.getmaxyx()
         
