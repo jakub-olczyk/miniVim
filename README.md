@@ -25,6 +25,24 @@ Poruszanie się po buforze odbywa się za pomocą klawiszy:
 Zgodnie z tym co na obrazku powyżej oraz sposobem poruszania się w oryginalnym
 Vi.
 
+Dodatkowo można przeskakiwać pomiędzy słowami. Jeśli jesteśmy w linijce jak ta
+(`^` wskazuje na pozycję kursora):
+
+	Linijka tekstu dla przykladu.
+	  ^
+
+Po wciśnięciu `ww` znajdziemy się:
+
+	Linijka tekstu dla przykladu.
+	               ^
+
+Ponieważ ta komenda przeskakuje na początek następnego słowa w linijce.
+Naciskając `b` sytuacja będzie wyglądać następująco:
+
+	Linijka tekstu dla przykladu.
+	        ^
+`b` przeskakuje na tej samej zasadzie co `w` tylko w drugą stronę.
+
 ### Wprowadzanie tekstu
 
 Aby wprowadzić tekst można skorzystać z komend `i`, `I`, `A` oraz `o`, które
@@ -63,10 +81,11 @@ Po wykonaniu 2.
 
 ### Podmiana tekstu
 
-Komenda, której nie ma w oryginalnym Vi -- `s` służy do podmiany tekstu w
-obecnej linii. Po jej naciśnięciu w pasku na dole ekranu pojawia się zachętka
-`s/`. Poprawna składnia komendy wygląda następująco:
+Komenda, która jest wywoływana w inny sposób w oryginalnym Vi -- `s` służy do
+podmiany tekstu w obecnej linii. Po jej naciśnięciu w pasku na dole ekranu
+pojawia się zachętka `s/`. Poprawna składnia komendy wygląda następująco:
 
 	s/<stary_tekst>/<nowy_tekst>/
 
-Przy czym ostatni `/` nie jest wymagany.
+Przy czym ostatni `/` nie jest wymagany. Pierwsze wystąpienie <starego_tekstu>
+jest podmieniane na <nowy_tekst>.
