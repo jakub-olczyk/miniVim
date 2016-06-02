@@ -8,6 +8,7 @@ wykorzytaniem:
 * oryginalnego Vima
 
 Wzorce projektowe wykorzystanie w projekcie:
+
 * Polecenie
 * Singleton 
 * Most

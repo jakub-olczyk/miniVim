@@ -102,3 +102,37 @@ class Buffer(object):
             self.current_line += 1
         if self.current_letter > len(self.main_buffer[self.current_line]):
             self.current_letter = len(self.main_buffer[self.current_line])
+
+    def word_fwd(self):
+        """ Jump one word forward to the beginning of next word """
+        line = self.main_buffer[self.current_line]
+        next_word = 0
+        x = self.current_letter
+        found_next = False
+        for i in xrange(x,len(line)):
+            if line[i] not in set(' \t\n'):
+                if found_next: # jeśli to pierwsza litera w słowie
+                    next_word = i
+                    break # zakończ bo chcemy tylko dolecieć do następnego słowa
+            else: # trafiliśmy na biały znak = znajdziemy następne słowo
+                found_next = True
+        self.current_letter = next_word
+
+    def word_bkwd(self):
+        """ Jump one word backward to the beginning """
+        line = self.main_buffer[self.current_line]
+        prev_word = 0
+        x = self.current_letter
+        ws_count = 0
+        first = True
+        for i in xrange(x,0,-1): #poruszamy się w tył od x do 0
+            if line[i] in set(' \n\t'):
+                if first:
+                    ws_count += 1
+                    first = False
+                if ws_count == 2:
+                    prev_word = i+1 # *poprzedni* czyli następny w sekwencji
+                    break
+            else:
+                first = True
+        self.current_letter = prev_word

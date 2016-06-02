@@ -119,7 +119,7 @@ class Editor(object):
         self.execute(cmd)
 
     def replace(self):
-        old, new, option = self.input.prompt_bar('s/').split('/')
+        old, new = self.input.prompt_bar('s/').split('/')
         cmd = Replace(self.current_buffer, old, new, self.current_buffer.current_line)
         self.execute(cmd)
 

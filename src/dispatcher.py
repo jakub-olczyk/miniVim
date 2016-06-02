@@ -29,6 +29,8 @@ class Dispatcher(object):
                 'l': self.editor.current_buffer.cursor_right,
                 'j': self.editor.current_buffer.cursor_down,
                 'k': self.editor.current_buffer.cursor_up,
+                'w': self.editor.current_buffer.word_fwd,
+                'b': self.editor.current_buffer.word_bkwd,
                 'i': self.editor.insert,
                 'I': self.editor.insert_start,
                 'A': self.editor.insert_end,
