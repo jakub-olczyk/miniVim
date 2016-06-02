@@ -124,7 +124,7 @@ class Replace(iCommand):
 
     def execute(self):
         self.old_line = self.buffer[self.line_num]
-        self.new_line = self.old_line.replace(self.old_text, self.new_text)
+        self.new_line = self.old_line.replace(self.old_text, self.new_text, 1)
         self.buffer[self.line_num] = self.new_line
 
     def undo(self):
