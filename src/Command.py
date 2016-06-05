@@ -25,11 +25,11 @@ class Command(object): # pseudo-interface in Python
 
     def execute(self):
         """ This is a method that is used to run the command """
-        pass
+        raise NotImplementedError("This is from interface!")
 
     def undo(self):
         """ This is a method to revert the commands wrongdoings :) """
-        pass
+        raise NotImplementedError("This is from interface!")
 
 class Insert(Command):
     ''' Acts similarly to Vi instert mode, but not quite :) '''

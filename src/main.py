@@ -7,5 +7,7 @@
 
 from Editor import Editor
 
-ed = Editor()
-ed.start()
+
+if __name__ == "__main__":
+    ed = Editor()
+    ed.start()

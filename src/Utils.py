@@ -14,7 +14,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-""" Funkcje pomocnicze """
+""" Helper functions, classes and what-not """
 
 import sys
 import traceback
@@ -22,12 +22,19 @@ import traceback
 THIS = sys.modules[__name__]
 THIS.EXCEPTION_COUNTER = 0
 
+class Singleton(type):
+    ''' A class that should be used as __metaclass__ for other classes '''
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
 def excepted(func):
-    ''' To jest dekorator do łapania wszelkich niepotrzebnych wyjatkow
-        dodatkowo ma za zadanie logować wszelkie wyjątki do pliku
-    '''
+    ''' This decorator is used to catch all exceptions and then log them '''
     def excepted_wrapper(*args, **kwargs):
-        """ cześć dekoratora """
+        """ This is the part of @excepted that does the logging """
         try:
             func(*args, **kwargs)
         except StandardError:
@@ -37,18 +44,5 @@ def excepted(func):
             THIS.EXCEPTION_COUNTER += 1
     return excepted_wrapper 
 
-class Singleton(object):
-    ''' Klasa, która w prosty sposób pozwala na stworzenie singletona '''
-
-    _instance = None
-
-    def __new__(self, *args, **kwargs):
-        if not isinstance(self._instance, self):
-            self._instance = object.__new__(self, *args, **kwargs)
-        return self._instance
-
-
-    def __instancecheck__(self, inst):
-        return isinstance(inst, self._decorated)
 
 

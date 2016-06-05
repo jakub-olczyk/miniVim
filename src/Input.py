@@ -10,9 +10,10 @@
 from Utils import Singleton
 from Screen import Screen
 
-class Input(Singleton):
-    ''' Most do komunikacji z częścią `curses' odpowiedzialną za komunikację z
-        użytkownikiem '''
+class Input(object):
+    """ This is a bridge to the part of ``curses'' that is used to get user input """
+
+    __metaclass__ = Singleton
 
     def __init__(self):
         self.screen = Screen() # łatwiejsze dobranie się do istniejącego już Singletona
@@ -33,7 +34,7 @@ class Input(Singleton):
         return user_input
 
     def get(self, buff, y_pos, x_pos):
-        ''' main functionality of input class '''
+        ''' main functionality of input class. This is used in insert mode to get the user input '''
         tmp_buff = buff[:] # we want to work on copy
         import curses.ascii
         if y_pos == 0 and len(tmp_buff) == 0: # add first line if needed

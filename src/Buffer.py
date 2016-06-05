@@ -24,8 +24,7 @@ class Buffer(object):
     ''' This class represents single file open in the editor. It is here for
     making it easier to add support for multiple tabs and editing of several
     files simultaneously .
-    Kinda mimics the work of pythonic list
-    '''
+    Kinda mimics the work of Python's list. '''
 
     def __init__(self, filename=''):
         '''
@@ -68,8 +67,7 @@ class Buffer(object):
     @excepted
     def save_file(self):
         """
-        If there is no file_name it will prompt the user for the file_name
-        before saving it.
+        Expects that there is a self.file_name defined!
         """
         assert (self.file_name != ''), "Filename cannot be empty!"
         with open('./'+self.file_name, 'w+') as _file:

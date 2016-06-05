@@ -17,9 +17,11 @@
 import os, curses
 from Utils import Singleton
 
-class Screen(Singleton):
+class Screen(object):
     ''' This is abstraction of the user interface. It uses the curses library for
     displaying actual stuff on the screen.'''
+
+    __metaclass__ = Singleton
 
     def __init__(self, buff=None):
         self.current_buffer = buff
@@ -39,30 +41,32 @@ class Screen(Singleton):
         curses.endwin()
 
     def draw(self, read):
-        ''' Main drawing routine 
-            read is used to display lastpressed character'''
+        ''' Main drawing routine. 
+        Read is used to display lastpressed character'''
         self.draw_cursor_position() # show y,x position of cursor on the screen
         self.draw_last_pressed(read) # display last character pressed'
         self.print_buffer() # display the contents of buffer
         self.draw_cursor() #show cursor on the screen 
 
     def clear(self):
+        """ Clear the Screen """
         self.stdscr.clear()
 
     def refresh(self):
+        """ Refresh the Screen """
         self.stdscr.refresh()
 
     def getmaxyx(self):
         return self.stdscr.getmaxyx()
 
     def print_bar(self, message):
-        ''' Prints message in the bottom bar '''
+        ''' Prints message in the bottom notification bar '''
         curses.echo()
         self.stdscr.addstr(self.MAX_Y - 1, 0, str(message))
         self.refresh()
 
     def print_buffer(self):
-        ''' prints the currently open buffer ''' 
+        ''' Show the contents of currently worked on Buffer ''' 
 
         for i, line in enumerate(self.current_buffer):
             if i < self.MAX_Y-1:
@@ -78,7 +82,7 @@ class Screen(Singleton):
                 self.stdscr.addstr(len(self.current_buffer) + i, 0, '~')
 
     def draw_cursor(self):
-        ''' Show current position of cursor '''
+        ''' Show the cursor in its current position '''
         curses.curs_set(2)
         self.stdscr.refresh()
         curses.setsyx(self.current_buffer.current_line, self.current_buffer.current_letter)
@@ -86,8 +90,7 @@ class Screen(Singleton):
 
     def draw_cursor_position(self):
         '''
-        clears the screen
-        then draws the cursor position in current buffer
+        Clear the screen then draw the coordinates of cursor in current buffer
         '''
         self.clear()
         curr_line = self.current_buffer.current_line
@@ -96,12 +99,12 @@ class Screen(Singleton):
         self.stdscr.addstr(self.MAX_Y-1, self.MAX_X-8, positon, curses.A_REVERSE)
 
     def draw_last_pressed(self, read):
-        ''' show last pressed character on the bar '''
+        ''' Show last pressed character on the bar '''
         if read != '\n':
             self.stdscr.addstr(self.MAX_Y-1, self.MAX_X-20, str(read))
     
     def normal_mode(self):
-        ''' Set screen to be like normal mode in Vim '''
+        ''' Set screen to not print pressed keys like in normal mode in Vim '''
         curses.noecho()
 
     def option_mode(self):
@@ -112,10 +115,10 @@ class Screen(Singleton):
         curses.echo()
 
 def insert_mode(func):
-    ''' Set screen to be in insert mode then execute what needs executing '''
-    def fun_wrap(*args, **kwargs):
+    ''' Set screen to show the keys pressed and then execute what needs executing '''
+    def insert_wrap(*args, **kwargs):
         curses.echo()
         func(*args, **kwargs)
         curses.noecho()
-    return fun_wrap 
+    return insert_wrap
 
