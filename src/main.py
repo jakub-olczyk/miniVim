@@ -5,7 +5,7 @@
 # Published under GNU General Public License version 2 or above
 # For full text of the license visit www.gnu.org/licenses/gpl.html
 
-from editor import Editor
+from Editor import Editor
 
 ed = Editor()
 ed.start()

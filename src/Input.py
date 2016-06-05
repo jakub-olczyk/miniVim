@@ -7,11 +7,10 @@
 
 """ Main module with the abstraction for getting input from user """
 
-from utils import Singleton
-from screen import Screen
+from Utils import Singleton
+from Screen import Screen
 
-@Singleton
-class Input(object):
+class Input(Singleton):
     ''' Most do komunikacji z częścią `curses' odpowiedzialną za komunikację z
         użytkownikiem '''
 

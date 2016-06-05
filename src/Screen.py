@@ -15,10 +15,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os, curses
-from utils import Singleton
+from Utils import Singleton
 
-@Singleton
-class Screen(object):
+class Screen(Singleton):
     ''' This is abstraction of the user interface. It uses the curses library for
     displaying actual stuff on the screen.'''
 

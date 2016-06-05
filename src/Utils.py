@@ -26,7 +26,7 @@ def excepted(func):
     ''' To jest dekorator do łapania wszelkich niepotrzebnych wyjatkow
         dodatkowo ma za zadanie logować wszelkie wyjątki do pliku
     '''
-    def func_wrap(*args, **kwargs):
+    def excepted_wrapper(*args, **kwargs):
         """ cześć dekoratora """
         try:
             func(*args, **kwargs)
@@ -35,15 +35,20 @@ def excepted(func):
             with open('vi.log', 'w+' if THIS.EXCEPTION_COUNTER == 0 else 'a') as log:
                 log.write(str(THIS.EXCEPTION_COUNTER) + ":" + msg+'\n')
             THIS.EXCEPTION_COUNTER += 1
-    return func_wrap
+    return excepted_wrapper 
 
-def Singleton(class_):
-    ''' Dekorator, który w prosty sposób pozwala na stworzenie Singleton '''
-    instances = {} # słownik instancji obiektów, które mają być singletonami
-    def getinstance(*args, **kwargs):
-        """ cześć dekoratora """
-        if class_ not in instances:
-            instances[class_] = class_(*args, **kwargs)
-        return instances[class_]
-    return getinstance
+class Singleton(object):
+    ''' Klasa, która w prosty sposób pozwala na stworzenie singletona '''
+
+    _instance = None
+
+    def __new__(self, *args, **kwargs):
+        if not isinstance(self._instance, self):
+            self._instance = object.__new__(self, *args, **kwargs)
+        return self._instance
+
+
+    def __instancecheck__(self, inst):
+        return isinstance(inst, self._decorated)
+
 

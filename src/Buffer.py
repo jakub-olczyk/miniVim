@@ -18,7 +18,7 @@
 
 """ This is the module with main model for file that is being worked on """
 
-from utils import excepted
+from Utils import excepted
 
 class Buffer(object):
     ''' This class represents single file open in the editor. It is here for
@@ -81,7 +81,10 @@ class Buffer(object):
         """ A method used to load file to RAM """
         self.file_name = filename
         with open(filename, 'r') as _file:
-            self.main_buffer = _file.readlines()
+            #self.main_buffer = _file.readlines()
+            self.main_buffer = []
+            for line in _file.readlines():
+                self.main_buffer.append(line.rstrip())
 
     @excepted
     def cursor_left(self):

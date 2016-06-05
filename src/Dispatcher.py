@@ -17,7 +17,7 @@
 
 """ A class that is used instead a jungle made with if elif else statements """
 
-from utils import excepted
+from Utils import excepted
 
 class Dispatcher(object):
     ''' A substitute to tree of `if elif else`, with logging capabilities due

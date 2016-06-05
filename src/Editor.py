@@ -16,12 +16,12 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from commands import Insert, Delete, Replace
-from utils import excepted
-from dispatcher import Dispatcher
-from buffer import Buffer
-from screen import Screen, insert_mode
-from input import Input
+from Command import Insert, Delete, Replace
+from Utils import excepted
+from Dispatcher import Dispatcher
+from Buffer import Buffer
+from Screen import Screen, insert_mode
+from Input import Input
 
 ''' Mega uproszczony Vim stworzony jako projekt zaliczeniowy '''
 
@@ -138,7 +138,7 @@ class Editor(object):
         if s.startswith('x'): #save and exit
             self.screen.stdscr.addstr(self.screen.MAX_Y-1,0,'Saving...')
             self.current_buffer.save_file()
-            self.stdscr.refresh()
+            self.screen.stdscr.refresh()
             self.running = False
 
         if s.startswith('e'): #edit file
