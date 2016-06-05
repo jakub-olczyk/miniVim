@@ -18,7 +18,7 @@
 
 """ This is the module with main model for file that is being worked on """
 
-from Utils import excepted
+from src.Utils import excepted
 
 class Buffer(object):
     ''' This class represents single file open in the editor. It is here for
@@ -66,6 +66,7 @@ class Buffer(object):
         self.main_buffer.remove(value)
 
     def count(self, obj):
+        """ Access to list method """
         return self.main_buffer.count(obj)
 
     @excepted

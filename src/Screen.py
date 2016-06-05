@@ -1,6 +1,6 @@
 # coding=utf8
 #    miniVim
-#    Copyright (c) Jakub Olczyk 
+#    Copyright (c) Jakub Olczyk
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -14,9 +14,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, curses
+""" This module contains class to communicate with the ``curses'' module """
+import curses
 import locale
-from Utils import Singleton
+from src.Utils import Singleton
 
 class Screen(object):
     ''' This is abstraction of the user interface. It uses the curses library for
@@ -30,26 +31,26 @@ class Screen(object):
         self.current_buffer = buff
         self.stdscr = curses.initscr()
         self.MAX_Y, self.MAX_X = self.getmaxyx()
-        
+
         self.stdscr.keypad(True)
         curses.noecho()
         curses.cbreak()
         curses.curs_set(2)
 
     def destructor(self):
-
+        """ a clean-up function """
         self.stdscr.keypad(False)
         curses.nocbreak()
         curses.echo()
         curses.endwin()
 
     def draw(self, read):
-        ''' Main drawing routine. 
+        ''' Main drawing routine.
         Read is used to display lastpressed character'''
         self.draw_cursor_position() # show y,x position of cursor on the screen
         self.draw_last_pressed(read) # display last character pressed'
         self.print_buffer() # display the contents of buffer
-        self.draw_cursor() #show cursor on the screen 
+        self.draw_cursor() #show cursor on the screen
 
     def clear(self):
         """ Clear the Screen """
@@ -69,7 +70,7 @@ class Screen(object):
         self.refresh()
 
     def print_buffer(self):
-        ''' Show the contents of currently worked on Buffer ''' 
+        ''' Show the contents of currently worked on Buffer '''
 
         for i, line in enumerate(self.current_buffer):
             if i < self.MAX_Y-1:
@@ -98,14 +99,14 @@ class Screen(object):
         self.clear()
         curr_line = self.current_buffer.current_line
         curr_letter = self.current_buffer.current_letter
-        positon = '{},{}'.format(curr_line,curr_letter)
+        positon = '{},{}'.format(curr_line, curr_letter)
         self.stdscr.addstr(self.MAX_Y-1, self.MAX_X-8, positon, curses.A_REVERSE)
 
     def draw_last_pressed(self, read):
         ''' Show last pressed character on the bar '''
         if read != '\n':
             self.stdscr.addstr(self.MAX_Y-1, self.MAX_X-20, str(read))
-    
+
     def normal_mode(self):
         ''' Set screen to not print pressed keys like in normal mode in Vim '''
         curses.noecho()

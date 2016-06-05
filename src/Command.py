@@ -70,11 +70,11 @@ class Insert(Command):
 
     def undo(self):
         # revert the changes
-        for i, old, new in self.changes:
+        for i, old, _ in self.changes:
             self.document[i] = old
 
         # delete all None lines
-        for line in xrange(self.document.count(None)):
+        for i in xrange(self.document.count(None)):
             self.document.remove(None)
 
 

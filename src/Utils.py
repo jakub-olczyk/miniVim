@@ -42,7 +42,4 @@ def excepted(func):
             with open('vi.log', 'w+' if THIS.EXCEPTION_COUNTER == 0 else 'a') as log:
                 log.write(str(THIS.EXCEPTION_COUNTER) + ":" + msg+'\n')
             THIS.EXCEPTION_COUNTER += 1
-    return excepted_wrapper 
-
-
-
+    return excepted_wrapper

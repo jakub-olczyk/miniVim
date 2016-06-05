@@ -7,8 +7,8 @@
 
 """ Main module with the abstraction for getting input from user """
 
-from Utils import Singleton
-from Screen import Screen
+from src.Utils import Singleton
+from src.Screen import Screen
 
 class Input(object):
     """ This is a bridge to the part of ``curses'' that is used to get user input """
