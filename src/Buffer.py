@@ -34,6 +34,7 @@ class Buffer(object):
         self.main_buffer = []
         self.current_line = 0
         self.current_letter = 0
+        self.open_file(self.file_name)
 
     def __iter__(self):
         return iter(self.main_buffer)
@@ -63,6 +64,9 @@ class Buffer(object):
         """ remove first occurance of value. Raises ValueError when no value is
         present """
         self.main_buffer.remove(value)
+
+    def count(self, obj):
+        return self.main_buffer.count(obj)
 
     @excepted
     def save_file(self):

@@ -58,6 +58,9 @@ class Settings(object):
         _buffer = self.editor.current_buffer
         filename = self.input.prompt_bar('Open file:')
         _buffer.open_file(filename)
+        # reset the command stacks, when starting with fresh new file
+        self.editor.command_stack = []
+        self.editor.undo_stack = []
 
     #def action_print_debug(self):
         #if s.startswith('p'): # undocumented feature used for debugging

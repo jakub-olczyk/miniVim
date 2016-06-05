@@ -5,9 +5,14 @@
 # Published under GNU General Public License version 2 or above
 # For full text of the license visit www.gnu.org/licenses/gpl.html
 
-from Editor import Editor
-
+from src.Editor import Editor
 
 if __name__ == "__main__":
-    ed = Editor()
+    import sys
+    file_to_open = ''
+
+    if sys.argv[0] == 'minivimtutor' or sys.argv[0] == './minivimtutor':
+        file_to_open = '/home/jakub/workbench/minivi/src/demo-edytora'
+
+    ed = Editor(file_to_open)
     ed.start()

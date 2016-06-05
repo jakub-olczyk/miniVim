@@ -56,12 +56,13 @@ class Insert(Command):
         diff = len(longer) - len(shorter)
 
         for i in xrange(diff):
-            shorter.append('')
+            shorter.append(None)
 
         # determine the changes
         for i, old in enumerate(self.document):
             if old != self.new_buff[i]: # add only differences
-                self.changes.append(tuple([i, old, self.new_buff[i]]))
+                tup = (i, old, self.new_buff[i])
+                self.changes.append(tup)
 
         # add the changes
         for i, old, new in self.changes:
@@ -71,6 +72,11 @@ class Insert(Command):
         # revert the changes
         for i, old, new in self.changes:
             self.document[i] = old
+
+        # delete all None lines
+        for line in xrange(self.document.count(None)):
+            self.document.remove(None)
+
 
 class Delete(Command):
     ''' Delete depending on the other operand'''
@@ -83,6 +89,9 @@ class Delete(Command):
         self.text = (None, None) # (x,deleted text)
         self.letter = letter # the command used
 
+    def __repr__(self):
+        return "Delete(%s, %s)" % (repr(self.buffer), repr(self.letter))
+
     def execute(self):
         line = self.buffer[self.line] # alias to current line
         if self.letter in set("hldD"):
@@ -90,7 +99,7 @@ class Delete(Command):
                 try:
                     self.text = line[self.start:]
                     new_line = line[:self.start]
-                    line = new_line
+                    self.buffer[self.line] = new_line
                 except StandardError:
                     self.text = (None, None)
             elif self.letter == 'd': # delete current line
@@ -100,23 +109,22 @@ class Delete(Command):
             elif self.letter == 'l': #delete current letter
                 x_pos = self.buffer.current_letter
                 self.text = (x_pos, line[x_pos]) # we need to get the position in line
-                line = line[:x_pos] + line[x_pos+1:]
+                self.buffer[self.line] = line[:x_pos] + line[x_pos+1:]
             elif self.letter == 'h': #delete one before current letter
                 x_pos = self.buffer.current_letter-1
                 self.text = (x_pos, line[x_pos]) # we need to get the position in line
-                line = line[:x_pos] + line[x_pos+1:]
+                self.buffer[self.line] = line[:x_pos] + line[x_pos+1:]
             else:
                 pass
         else:# not in set(hjkldD)
             pass
-
 
     def undo(self):
         line = self.buffer[self.line] # alias to current line
         if self.letter == 'D':
             line += self.text
         elif self.letter == 'd':
-            line.insert(self.line, self.text)
+            self.buffer.insert(self.line, self.text)
         elif self.letter == 'l' or self.letter == 'h':
             x_pos, letter = self.text
             line = line[:x_pos] + letter + line[x_pos:]

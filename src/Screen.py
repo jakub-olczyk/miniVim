@@ -15,6 +15,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os, curses
+import locale
 from Utils import Singleton
 
 class Screen(object):
@@ -22,6 +23,8 @@ class Screen(object):
     displaying actual stuff on the screen.'''
 
     __metaclass__ = Singleton
+    locale.setlocale(locale.LC_ALL, '')
+    __code = locale.getpreferredencoding()
 
     def __init__(self, buff=None):
         self.current_buffer = buff

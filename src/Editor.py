@@ -31,10 +31,10 @@ class Editor(object):
     This class represents the editor. 
     It is responsible of keeping track of open buffers and commands issued.
     '''
-    def __init__(self):
+    def __init__(self, file_to_open=''):
         self.running = True
 
-        self.buffers = [Buffer('')] # the list of open buffers
+        self.buffers = [Buffer(file_to_open)] # the list of open buffers
         self.current_buffer = self.buffers[0] # first of the buffers
 
         self.screen = Screen(self.current_buffer)
@@ -113,9 +113,7 @@ class Editor(object):
 
     def delete_move(self):
         buff = self.current_buffer
-        curr_line = buff.current_line
-        curr_letter = buff.current_letter
-        letter = self.input.getkey()
+        letter = self.input.getkey() # get the move key
         d = Delete(buff, letter)
         self.execute(d)
 
@@ -125,14 +123,18 @@ class Editor(object):
 
     def replace(self):
         """ Execute the Replace Command """
-        old, new = self.input.prompt_bar('s/').split('/')
+        result = self.input.prompt_bar('s/')
+        try:
+            old, new = result.split('/')
+        except ValueError:
+            old, new, option = result.split('/')
         cmd = Replace(self.current_buffer, old, new, self.current_buffer.current_line)
         self.execute(cmd)
 
     def settings(self):
         s = self.input.prompt_bar(":")
-        options = Settings(self)
-        options.execute(s)
+        setting = Settings(self)
+        setting.execute(s)
 
     def debug_buffer(self):
         with open("debug_editor", "w") as debug:
@@ -140,10 +142,14 @@ class Editor(object):
             debug.write("EOF")
 
     def start(self):
+        """ Main method that starts the READ-EVAL-DRAW loop that editor uses to work properly"""
         dispatcher = Dispatcher(self)
-        self.screen.draw('')
-        while self.running:
-            read = self.input.getkey()
-            dispatcher.execute(read)
-            self.screen.draw(read) 
+        self.screen.draw('') # we need to add the empty character
+        try:
+            while self.running:
+                read = self.input.getkey()
+                dispatcher.execute(read)
+                self.screen.draw(read) 
+        except RuntimeError:
+            self.screen.destructor() # do the cleanup, even if there was some problem with the app
         self.screen.destructor() # needs cleaning to be more Pythonic
