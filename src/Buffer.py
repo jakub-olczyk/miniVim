@@ -33,9 +33,9 @@ class Buffer(object):
         '''
         self.file_name = filename
         self.main_buffer = []
-        self.cursor = Cursor(self.main_buffer)
         if filename != '':
             self.open_file(self.file_name)
+        self.cursor = Cursor(self.main_buffer)
 
     def __iter__(self):
         return iter(self.main_buffer)
