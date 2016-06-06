@@ -12,7 +12,7 @@ if __name__ == "__main__":
     file_to_open = ''
 
     if sys.argv[0] == 'minivimtutor' or sys.argv[0] == './minivimtutor':
-        file_to_open = '/home/jakub/workbench/minivi/src/demo-edytora'
+        file_to_open = '/home/jakub/workbench/minivi/doc/demo-edytora'
 
     ed = Editor(file_to_open)
     ed.start()
