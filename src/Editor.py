@@ -36,6 +36,7 @@ class Editor(object):
 
         self.buffers = [Buffer(file_to_open)] # the list of open buffers
         self.current_buffer = self.buffers[0] # first of the buffers
+        self.current_cursor = self.current_buffer.cursor
 
         self.screen = Screen(self.current_buffer)
         self.input = Input()

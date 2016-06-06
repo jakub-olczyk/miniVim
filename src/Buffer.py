@@ -19,6 +19,7 @@
 """ This is the module with main model for file that is being worked on """
 
 from src.Utils import excepted
+from src.Cursor import Cursor
 
 class Buffer(object):
     ''' This class represents single file open in the editor. It is here for
@@ -32,9 +33,9 @@ class Buffer(object):
         '''
         self.file_name = filename
         self.main_buffer = []
-        self.current_line = 0
-        self.current_letter = 0
-        self.open_file(self.file_name)
+        self.cursor = Cursor(self.main_buffer)
+        if filename != '':
+            self.open_file(self.file_name)
 
     def __iter__(self):
         return iter(self.main_buffer)
@@ -89,64 +90,20 @@ class Buffer(object):
             for line in _file.readlines():
                 self.main_buffer.append(line.rstrip())
 
-    @excepted
-    def cursor_left(self):
-        """ Move cursor one character to the left """
-        if self.current_letter > 0:
-            self.current_letter -= 1
+    ############ Code for compatibility reasons with older part of the application
+    @property
+    def current_line(self):
+        return self.cursor._nline
 
-    @excepted
-    def cursor_right(self):
-        """ Move cursor one character to the right """
-        if self.current_letter < len(self.main_buffer[self.current_line]):
-            self.current_letter += 1
+    @current_line.setter
+    def current_line(self, value):
+        self.cursor._nline = value
 
-    @excepted
-    def cursor_up(self):
-        """ Move cursor one line up """
-        if self.current_line > 0:
-            self.current_line -= 1
-        if self.current_letter > len(self.main_buffer[self.current_line]):
-            self.current_letter = len(self.main_buffer[self.current_line])
+    @property
+    def current_letter(self):
+        return self.cursor._ncolumn
 
-    @excepted
-    def cursor_down(self):
-        """ Move cursor one line down """
-        if self.current_line < len(self.main_buffer) - 1:
-            self.current_line += 1
-        if self.current_letter > len(self.main_buffer[self.current_line]):
-            self.current_letter = len(self.main_buffer[self.current_line])
-
-    def word_fwd(self):
-        """ Jump one word forward to the beginning of next word """
-        line = self.main_buffer[self.current_line]
-        next_word = 0
-        x_pos = self.current_letter
-        found_next = False
-        for i in xrange(x_pos, len(line)):
-            if line[i] not in set(' \t\n,.'):
-                if found_next: # jeśli to pierwsza litera w słowie
-                    next_word = i
-                    break # zakończ bo chcemy tylko dolecieć do następnego słowa
-            else: # trafiliśmy na biały znak = znajdziemy następne słowo
-                found_next = True
-        self.current_letter = next_word
-
-    def word_bkwd(self):
-        """ Jump one word backward to the beginning """
-        line = self.main_buffer[self.current_line]
-        prev_word = 0
-        x_pos = self.current_letter
-        ws_count = 0
-        first = True
-        for i in xrange(x_pos, 0, -1): #poruszamy się w tył od x do 0
-            if line[i] in set(' \n\t,.'):
-                if first:
-                    ws_count += 1
-                    first = False
-                if ws_count == 2:
-                    prev_word = i+1 # *poprzedni* czyli następny w sekwencji
-                    break
-            else:
-                first = True
-        self.current_letter = prev_word
+    @current_letter.setter
+    def current_letter(self, value):
+        self.cursor._ncolumn = value
+    ############ Compatibility code end
