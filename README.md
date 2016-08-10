@@ -1,91 +1,82 @@
 # miniVim
 
-Bardzo prosty edytor tekstowy zainspirowany działaniem klasycznego edytora Vi.
-Napisany jako projekt zaliczeniowy z przedmiotu "Wzorce projektowe" z
-wykorzytaniem:
+Basic text editor inspired by the classic Unix editor - Vi. It was written as
+an assignment for 'Design patterns' class at univesity using:
 
-* modułu do Pythona `curses` 
-* oryginalnego Vima
+* Python  `curses` module
+* Vim - text editor :)
 
-Wzorce projektowe wykorzystanie w projekcie:
+## Basic movements
 
-* Polecenie
-* Singleton 
-* Most
-* Dekorator
-
-## Obsługa
-
-Poruszanie się po buforze odbywa się za pomocą klawiszy:
+To move around the buffer you should use standard Vi keys:
 
 		    ^
 	< h  j  k  l >
 		 v
 
-Zgodnie z tym co na obrazku powyżej oraz sposobem poruszania się w oryginalnym
-Vi.
+Jump movements are also implemented. If you are unfamiliar with those here's a
+quick example:
+(`^` marks the positon of the cursor):
 
-Dodatkowo można przeskakiwać pomiędzy słowami. Jeśli jesteśmy w linijce jak ta
-(`^` wskazuje na pozycję kursora):
-
-	Linijka tekstu dla przykladu.
+	A line of simple text.
 	  ^
 
-Po wciśnięciu `ww` znajdziemy się:
+After hitting `ww` the cursor will move to this position:
 
-	Linijka tekstu dla przykladu.
-	               ^
+	A line of simple text.
+	          ^
+To put it in words the `w` command is used for jumping one word forward.
 
-Ponieważ ta komenda przeskakuje na początek następnego słowa w linijce.
-Naciskając `b` sytuacja będzie wyglądać następująco:
+There is a way to move one word backwards - it is the `b` command.  Here's what
+happens after hitting `b` once:
 
-	Linijka tekstu dla przykladu.
-	        ^
-`b` przeskakuje na tej samej zasadzie co `w` tylko w drugą stronę.
+	A line of simple text.
+	       ^
 
-### Wprowadzanie tekstu
+### Inserting text
 
-Aby wprowadzić tekst można skorzystać z komend `i`, `I`, `A` oraz `o`, które
-działają tak jak w Vi.
+Like in Vi there is a bunch of commads for inserting text. They are really
+useful in day to day editing. I chose to implement only selected few - namely 
+`i`, `I`, `A` and `o`.
 
-* `i`, `I` wchodzą w tryb Insert. `I` przeskakuje do początku linii przed wejściem.
-  `i` - pozwala na wejście w tryb wprowadzania tekstu pod kursorem.
-* `A` pozwala na wprowadzenie tekstu po przeskoku do końca linii.
-* `o` przeskakuje do następnej linii i wchodzi w tryb Insert
+* `I` - jumps to the beginning of the line before going to the insert mode.
+* `i` - goes to the insert mode right where the cursor is.
+* `A` - jumps to the end of line before going to the insert mode.
+* `o` - jumps one line and then goes to the insert mode.
 
-### Usuwanie tekstu
+### Deleting text
 
-Służą do tego polecenia `d` oraz `D`. `D` usuwa tekst od kursora do końca
-linii. Natomiast `d` potrzebuje jeszcze jednego argumentu przed wykonaniem, a
-mianowicie kierunku. Zgodnie z komendami do poruszania.
+Basically there are two commands implemented - `d` and `D`. Uppercase `D`
+deletes text from current positon to the end of the line. Lowercase `d` is a
+bit more complex because it needs direction as an argument. The standard
+movements are the possible arguments. 
 
-#### Przykład. Usuwanie poziome
+#### Example
 
 	Przykladowa linijka tekstu.
 	    ^
-(`^` wskazuje pozycję kursora w linii).
+(`^` marks the cursor position).
 
-Można teraz wykonać dwa polecenia zmieniające obecną linijkę:
-1. `dl` - usunie literę, na którą wskazuje kursor.
-2. `dh` - usunie literę z przed kursora.
+There are 2 possible movements:
+1. `dl` - deletes the letter under cursor
+2. `dh` - deletes the letter before cursor
 
-Po wykonaniu 1. 
+After execution of 1st possibility.
 
 	Przyladowa linijka tekstu.
 	    ^
 
-Po wykonaniu 2.
+After execution of 2nd possibility.
 
 	Przkladowa linijka tekstu.
 	   ^
 
-### Podmiana tekstu
+### Substitution
 
-Komenda, która jest wywoływana w inny sposób w oryginalnym Vi -- `s` służy do
-podmiany tekstu w obecnej linii. Po jej naciśnięciu w pasku na dole ekranu
-pojawia się zachętka `s/`. Poprawna składnia komendy wygląda następująco:
+To use substitute command unlike original Vi you just type `s` and substitution
+prompt should appear at the bottom of the screen. **Only first** match is
+substituted.
 
-	s/<stary_tekst>/<nowy_tekst>/
+	s/<old_text>/<new_text>/
 
-Przy czym ostatni `/` nie jest wymagany. Pierwsze wystąpienie <starego_tekstu>
-jest podmieniane na <nowy_tekst>.
+Last `/` isn't mandatory. 
